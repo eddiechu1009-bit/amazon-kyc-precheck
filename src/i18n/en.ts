@@ -1,0 +1,241 @@
+import type { zh } from './zh';
+
+// Keep keys identical to zh.ts
+export const en: typeof zh = {
+  // App shell
+  appName: 'Pass KYC',
+  appTagline: 'Amazon EU Seller KYC Pre-Submission Self-Check',
+  appSubtitle: 'Check before you submit, not after you get rejected. Everything runs in your browser.',
+  privacyBadge: '🔒 100% in-browser · No file upload',
+  privacyDetail: 'Every answer and file you provide stays inside your browser. Nothing is sent to any server. Close the page and it is all gone.',
+  langLabel: 'Language',
+  resetAll: 'Start over',
+  resetConfirm: 'Clear all answers and uploads?',
+
+  // Home
+  homeTitleLead: 'KYC rejections',
+  homeTitleMain: 'are 80% caused by a handful of small details',
+  homeLead: 'We turned the most common EU KYC rejection patterns into a self-service checklist. Walk through it before you submit to dramatically raise your first-time pass rate.',
+  homeCtaStart: 'Start the self-check →',
+  homeStep1Title: 'Answer a few questions',
+  homeStep1Desc: 'Entity type, beneficial owners, bank country — under 3 minutes',
+  homeStep2Title: 'Upload or cross-check documents',
+  homeStep2Desc: 'Files are analyzed on your device. We flag typos, date issues, address mismatches',
+  homeStep3Title: 'Get a tailored report',
+  homeStep3Desc: 'What is missing, what to fix, what to do next — with EN/ZH drafts ready to send',
+
+  // Mode tabs
+  tabWizard: '📝 Pre-submission Check',
+  tabDocCheck: '📄 Document Check',
+  tabAfterReject: '🧭 After a Rejection',
+  tabWizardShort: 'Pre-Check',
+  tabDocCheckShort: 'Doc Check',
+  tabAfterRejectShort: 'After Reject',
+
+  // Wizard — Intro
+  wizardIntroTitle: 'Answer a few questions and get your personalized document list',
+  wizardIntroDesc: 'These questions map directly to what Amazon EU KYC verifies internally. The more accurate your answers, the more accurate the report.',
+
+  // Wizard — questions
+  qEntityTypeTitle: 'What kind of legal entity do you operate?',
+  qEntityTypeHint: 'The required documents differ significantly by entity type. This is the most important question.',
+  optLimited: 'Limited / Incorporated Company',
+  optLimitedHint: 'Taiwan Gongsi, HK Ltd., Mainland LLC, BV, GmbH, etc.',
+  optSoleProp: 'Sole Proprietorship / Business License',
+  optSolePropHint: 'Taiwan Hanghao, one-person studio',
+  optIndividual: 'Individual Seller',
+  optIndividualHint: 'Registered as an individual with no company record',
+
+  qCountryTitle: 'Where is the company / individual registered?',
+  qCountryHint: 'Based on the country on your business registration or ID document.',
+
+  qBoCountTitle: 'How many Beneficial Owners does the company have?',
+  qBoCountHint: 'A natural person holding 25%+ shares or with management control. Individuals should pick 1.',
+  optBo1: '1 (just me / single shareholder)',
+  optBo2: '2',
+  optBo3: '3 or more',
+
+  qBankTitle: 'Which country / region hosts the bank account you will use for disbursements?',
+  qBankHint: 'TW, HK, US, EU local, or a third-party like Payoneer / WorldFirst.',
+  optBankTw: 'Taiwan bank',
+  optBankHk: 'Hong Kong bank',
+  optBankUs: 'US bank',
+  optBankEu: 'EU local bank',
+  optBank3p: 'Third-party (Payoneer / WorldFirst / PingPong ...)',
+
+  qAddressChangedTitle: 'Have you changed your company address, email, or phone in the last 30 days?',
+  qAddressChangedHint: 'Any info change re-triggers KYC — a common moment to get asked for more docs.',
+  optYes: 'Yes',
+  optNo: 'No',
+
+  wizardPrev: '← Previous',
+  wizardNext: 'Next →',
+  wizardSubmit: 'Generate my checklist',
+  wizardProgress: 'Progress',
+
+  // Wizard — Report
+  reportTitle: 'Your personalized KYC document checklist',
+  reportSubtitle: 'Tailored to your answers. Click a card to expand prep tips and common rejection reasons.',
+  reportRequired: 'Required',
+  reportConditional: 'Conditional',
+  reportRecommended: 'Recommended',
+  reportNextStep: 'Next step',
+  reportNextStepMsg: 'Cross-check this list against the documents you have. If anything looks iffy, head to Document Check.',
+  reportGoDocCheck: 'Go to Document Check →',
+  reportBack: '← Edit answers',
+
+  // Doc check — Module ②
+  docCheckTitle: 'Upload documents for a self-check',
+  docCheckDesc: 'Drop in a PDF or image (JPG / PNG). We scan for missing fields, date validity, and cross-document consistency — entirely in your browser.',
+  docCheckDropZone: 'Drop files here, or click to browse',
+  docCheckDropHint: 'Supported: PDF · JPG · PNG · up to 10MB each',
+  docCheckAnalyze: 'Run self-check',
+  docCheckClearAll: 'Clear all',
+  docCheckProcessing: 'Analyzing on your device…',
+  docCheckOcrFirstLoad: 'Loading the OCR engine on first use (~15MB, one-time)…',
+  docCheckExtracted: 'What we detected',
+  docCheckFindings: 'Findings',
+  docCheckCrossCheck: 'Cross-document consistency',
+  docCheckEditExtracted: 'Edit and re-check',
+  docCheckDocType: 'Detected type',
+  docCheckNoFiles: 'Upload at least one document to begin.',
+  docCheckPdfScanned: 'This PDF looks like a scanned image with no text layer. OCR will be attempted.',
+  docCheckError: 'Could not read this file — please try a different format.',
+
+  // Doc fields (labels for extracted values)
+  docFieldHolder: 'Account holder',
+  docFieldIban: 'IBAN',
+  docFieldBic: 'BIC / SWIFT',
+  docFieldAccountNumber: 'Account number',
+  docFieldDate: 'Issue date',
+  docFieldAddress: 'Address',
+  docFieldTaxId: 'Tax ID',
+  docFieldCompanyName: 'Company / person name',
+  docFieldDocType: 'Document type',
+
+  // Doc type labels
+  docTypeBank: 'Bank statement / letter',
+  docTypeCompany: 'Company registration',
+  docTypePoa: 'Proof of address',
+  docTypeId: 'ID / passport',
+  docTypeUnknown: 'Unknown type',
+
+  // Findings (translation by key)
+  docFindingDateOk: 'Issue date is recent (within 90 days)',
+  docFindingDateWithin180: 'Date within 180 days — some teams still accept this for BAV',
+  docFindingDateStale: 'Document is older than 90 days — likely to be rejected',
+  docFindingDateFuture: 'Date looks to be in the future — double-check',
+  docFindingDateMissing: 'No issue date detected — add it manually to verify',
+  docFindingIbanOk: 'IBAN found',
+  docFindingIbanMissing: 'No IBAN detected — confirm it is visible on the document',
+  docFindingHolderOk: 'Account holder name found',
+  docFindingHolderMissing: 'Could not find the account holder name — required by Amazon',
+  docFindingHolderOnlyBank: 'Only the bank\'s own name was detected — no account holder. Please upload a clearer copy.',
+  docFindingAddressOk: 'Address detected',
+  docFindingAddressMissing: 'No address detected — required for BAV/POA',
+  docFindingAddressFormatOk: 'English address format looks standard',
+  docFindingAddressFormatWeak: 'Address may lack standard markers (Room / Building / # / No.)',
+  docFindingTaxIdOk: 'Tax ID (8-digit) detected',
+  docFindingTaxIdMissing: 'No 8-digit Taiwan Tax ID detected — confirm it is on the document',
+  docFindingCompanyNameOk: 'Company / person name detected',
+  docFindingCompanyNameMissing: 'Could not find an obvious company or person name',
+  docFindingUnknownType: 'Could not identify document type — the checks may be generic',
+  docFindingLowText: 'Very little text recognized — the file may be low quality or a scan',
+
+  // Candidate UI
+  docCandidatesTitle: 'Other names detected',
+  docCandidatesHint: "OCR sometimes mistakes the bank's name for the holder. Tap the real holder to override.",
+  docCandidateBankHint: 'bank',
+  docCandidateAddressTitle: 'Other addresses detected',
+  docCandidateAddressHint: 'The first non-bank address was picked. Tap to override if wrong.',
+  docShowRawOcr: 'Show raw OCR text',
+  docHideRawOcr: 'Hide raw OCR text',
+
+  // Cross-doc findings
+  docCrossNameMatch: 'Names match across documents',
+  docCrossNameMinorDiff: 'Names are very similar — check for typo / romanization drift',
+  docCrossNameMismatch: 'Names on different documents differ significantly',
+  docCrossAddressMatch: 'Addresses match across documents',
+  docCrossAddressDiff: 'Addresses differ across documents — align them before submitting',
+
+  // Levels
+  docLevelOk: 'Pass',
+  docLevelWarn: 'Warning',
+  docLevelFail: 'Fail',
+
+  // After reject — Module ③
+  afterRejectTitle: "Paste Amazon's rejection notice and we'll analyze it",
+  afterRejectHint: 'Paste the full email you received from Amazon Seller Support. Analysis happens entirely in your browser — nothing is sent to any server.',
+  afterRejectPlaceholder: 'e.g. Your bank account verification has failed multiple times because...',
+  afterRejectAnalyze: 'Analyze rejection',
+  afterRejectReset: 'Clear',
+  afterRejectTooShort: 'Text is too short — paste the full Amazon message (at least 20 characters).',
+  afterRejectResultTitle: 'Analysis result',
+  afterRejectCategory: 'Most likely category',
+  afterRejectConfidence: 'Based on these signals',
+  afterRejectCauses: 'Likely causes',
+  afterRejectNextSteps: 'Recommended next steps',
+  afterRejectAlternatives: 'Could also be:',
+  afterRejectReplyTitle: 'Response draft',
+  afterRejectReplyHint: "This draft uses Amazon's official reply language. Fill in the {bracketed} fields before sending.",
+  afterRejectReplyTabZh: '中文 Chinese',
+  afterRejectReplyTabEn: 'English',
+  afterRejectCopySubject: 'Copy subject',
+  afterRejectCopyBody: 'Copy body',
+  afterRejectTryAgain: 'Analyze another message',
+
+  // Module ③ editor
+  editorOpen: 'Edit this category',
+  editorTitle: 'Edit category content',
+  editorHint: "All edits stay in your browser — nothing is uploaded. You can reset to defaults at any time.",
+  editorFieldSummary: 'Summary',
+  editorFieldCauses: 'Likely causes (one per line)',
+  editorFieldNextSteps: 'Recommended next steps (one per line, most important first)',
+  editorFieldSubjectZh: 'Reply subject (Chinese)',
+  editorFieldSubjectEn: 'Reply subject (English)',
+  editorFieldBodyZh: 'Reply body (Chinese)',
+  editorFieldBodyEn: 'Reply body (English)',
+  editorExtraKeywords: 'Extra match keywords (one per line; boost classification accuracy)',
+  editorSave: 'Save',
+  editorCancel: 'Cancel',
+  editorReset: 'Reset to default',
+  editorResetConfirm: 'Reset this category back to factory defaults?',
+  editorSavedBadge: 'Customized',
+  editorUpdatedAt: 'Last updated',
+  editorExport: 'Export custom JSON',
+  editorImport: 'Import JSON',
+  editorClearAll: 'Clear all customizations',
+  editorImportOk: 'Imported successfully',
+  editorImportErr: 'Import failed',
+  editorSummaryZh: '中文',
+  editorSummaryEn: 'English',
+
+  // After reject placeholder (old)
+  afterRejectComingTitle: 'After a rejection (coming in v1)',
+  afterRejectComingDesc: 'Paste the rejection notice from Amazon. We will parse the reason, point you to the next action, and draft a bilingual response.',
+
+  // Footer
+  footerDataSource: 'Sources: Amazon Seller Central public guidance + common EU KYC internal rejection patterns. For reference only — final decision rests with Amazon.',
+  footerPrivacy: 'Privacy: This tool stores nothing. All processing happens in your browser.',
+  footerRelated: 'Related tools',
+  footerToolSellerKit: '🇪🇺 EU Seller Toolkit',
+  footerToolCaseWriter: '📝 Case Writer',
+  footerToolAccounting: '📊 Accounting Analyzer',
+
+  // Sources
+  sourcesTitle: 'Sources & basis',
+  sourceOfficial: 'Official',
+  sourceExperience: 'Experience',
+  sourceRetrievedAt: 'Last verified',
+  sourceLinkExternal: 'View source ↗',
+  sourcesDisclaimer: 'This tool is compiled from Amazon Seller Central public guidance and anonymized summaries of real review cases. The final decision always rests with Amazon as of the time you submit.',
+
+  // Common
+  copy: 'Copy',
+  copied: 'Copied',
+  download: 'Download',
+  yes: 'Yes',
+  no: 'No',
+  optional: 'Optional',
+  required: 'Required',
+};
