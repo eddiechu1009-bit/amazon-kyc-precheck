@@ -325,14 +325,207 @@ Thank you sincerely for your help.
   },
 };
 
+const TEMPLATE_DEADLINE_EXPIRED: ReplyTemplate = {
+  subject: {
+    zh: '【補件】錯過 60 天補件期限,現已補齊全部文件 — Case {CASE_ID}',
+    en: 'Re-submission: documents now complete after 60-day deadline — Case {CASE_ID}',
+  },
+  body: {
+    zh: `您好 Seller Support,
+
+感謝您的回覆。我了解我先前未在 60 天內補齊 KYC 要求文件,造成 Listing 與撥款被限制。我已於 {UPLOAD_DATE} 將所有先前缺件的文件上傳至 Seller Central:
+
+  · 公司登記相關文件(含 180 天內抄本)
+  · 受益人身分證明與地址證明
+  · 銀行證明信(未編輯,180 天內)
+  · 其他 Performance Notification 列出的文件
+
+我了解延期不會被核准,現在只能等帳號合規後系統自動解除限制。煩請協助確認文件是否全部符合要求;若有任何一項不足,請具體告知缺哪一個欄位。
+
+Case ID: {CASE_ID}
+
+謝謝。
+
+{YOUR_NAME}
+{YOUR_COMPANY}`,
+    en: `Hello Seller Support,
+
+Thank you for your response. I understand that I did not submit the required KYC documents within the 60-day window, resulting in listings and disbursements being disallowed. I have now uploaded all previously missing documents to Seller Central on {UPLOAD_DATE}:
+
+  · Company registration documents (including extract within 180 days)
+  · Beneficial owner ID and proof of address
+  · Bank letter (unedited, within 180 days)
+  · Any other documents listed in the Performance Notification
+
+I understand that extensions cannot be granted; I am waiting for the system to lift restrictions once the account becomes compliant. Please confirm whether every document meets the requirements, and if anything is still insufficient, kindly specify exactly which field is missing.
+
+Case ID: {CASE_ID}
+
+Thank you.
+
+{YOUR_NAME}
+{YOUR_COMPANY}`,
+  },
+};
+
+const TEMPLATE_THRESHOLD_TRIGGERED: ReplyTemplate = {
+  subject: {
+    zh: '【補件】PendingThreshold 完整 KYC 文件提交 — Case {CASE_ID}',
+    en: 'Re-submission: Full KYC documents for PendingThreshold — Case {CASE_ID}',
+  },
+  body: {
+    zh: `您好 Seller Support,
+
+我了解我的帳戶已達到 PendingThreshold,觸發完整 First Time KYC 流程。我已依 Performance Notification 列出的全部文件要求,重新提交完整文件組如下:
+
+  · 公司設立登記表 + 180 天內抄本
+  · 所有受益人 (BO) 的身分證 + 地址證明
+  · 銀行正式證明信(Certified Bank Letter)
+  · 授權書 (LoA) (若適用)
+  · 其他 Performance Notification 列出的文件
+
+Case ID: {CASE_ID}
+
+我了解 Listing 與撥款會在系統判定 Compliant 後自動恢復。謝謝您的協助。
+
+{YOUR_NAME}
+{YOUR_COMPANY}`,
+    en: `Hello Seller Support,
+
+I understand my account has hit the PendingThreshold and full First Time KYC is now required. I have submitted the complete document set per the Performance Notification requirements:
+
+  · Company registration + extract within 180 days
+  · ID + proof of address for every beneficial owner
+  · Certified Bank Letter
+  · Letter of Authorization (if applicable)
+  · Any other documents listed in the Performance Notification
+
+Case ID: {CASE_ID}
+
+I understand that listings and disbursements will auto-resume once the account is marked Compliant. Thank you for your assistance.
+
+{YOUR_NAME}
+{YOUR_COMPANY}`,
+  },
+};
+
+const TEMPLATE_LOA_REDRAFT: ReplyTemplate = {
+  subject: {
+    zh: '【補件】重新起草授權書 (LoA) — Case {CASE_ID}',
+    en: 'Re-submission: Redrafted Letter of Authorization — Case {CASE_ID}',
+  },
+  body: {
+    zh: `您好 Seller Support,
+
+感謝指出授權書 (LoA) 的問題。我已重新起草一份符合要求的授權書,包含以下全部要素:
+
+  · 明確授權主要聯絡人「open, manage, and initiate transactions on the Amazon seller account」
+  · 由公司法人代表 / 董事親筆簽名(非數位簽章)
+  · 加蓋公司印章
+  · 註明開立日期(180 天內)
+
+新版授權書已上傳至 Seller Central,煩請協助審核。
+
+Case ID: {CASE_ID}
+
+謝謝。
+
+{YOUR_NAME}
+{YOUR_COMPANY}`,
+    en: `Hello Seller Support,
+
+Thank you for flagging the Letter of Authorization issue. I have redrafted a compliant LoA that includes all required elements:
+
+  · Explicit authorization for the primary contact "to open, manage, and initiate transactions on the Amazon seller account"
+  · Signed in person by the legal representative / director (not digital)
+  · Company stamp applied
+  · Issue date specified (within 180 days)
+
+The new LoA has been uploaded to Seller Central. Please proceed with the review.
+
+Case ID: {CASE_ID}
+
+Thank you.
+
+{YOUR_NAME}
+{YOUR_COMPANY}`,
+  },
+};
+
+const TEMPLATE_STRUCTURE_SUBMIT: ReplyTemplate = {
+  subject: {
+    zh: '【補件】公司股東架構完整文件 — Case {CASE_ID}',
+    en: 'Re-submission: Complete corporate ownership documents — Case {CASE_ID}',
+  },
+  body: {
+    zh: `您好 Seller Support,
+
+感謝指出股東結構文件不完整的問題。我已準備完整股東架構文件如下:
+
+  · Organizational Chart — 從最終受益人到本公司,每層股權比例清楚標示
+  · Articles of Association
+  · Share Register / Share Certificate
+  · Statement of Capital (或最新 Annual Return)
+  {TRUST_IF_APPLICABLE}
+
+所有 BO (25% 以上股份的自然人) 已一併提供身分證明與地址證明。
+
+Case ID: {CASE_ID}
+
+若有任何文件仍不足,請具體告知。
+
+{YOUR_NAME}
+{YOUR_COMPANY}`,
+    en: `Hello Seller Support,
+
+Thank you for flagging the incomplete shareholder structure. I have prepared a complete corporate ownership package:
+
+  · Organizational Chart — mapping ownership % at every layer from ultimate beneficial owner to this entity
+  · Articles of Association
+  · Share Register / Share Certificate
+  · Statement of Capital (or the latest Annual Return)
+  {TRUST_IF_APPLICABLE}
+
+ID and proof of address have been provided for every BO (natural person holding 25%+ shares).
+
+Case ID: {CASE_ID}
+
+If anything is still insufficient, please specify.
+
+{YOUR_NAME}
+{YOUR_COMPANY}`,
+  },
+};
+
 const TEMPLATES: Record<RejectionCategory, ReplyTemplate> = {
+  // BAV / bank
   bav_document_authenticity: TEMPLATE_BAV_RESUBMIT,
   bav_document_missing_fields: TEMPLATE_BAV_RESUBMIT,
   name_mismatch: TEMPLATE_NAME_MISMATCH,
+  third_party_acl_invalid: TEMPLATE_BAV_RESUBMIT,
+  // Quality / validity
   kyc_document_quality: TEMPLATE_QUALITY,
-  info_change_reverification: TEMPLATE_INFO_CHANGE,
+  document_expired_180: TEMPLATE_BAV_RESUBMIT,
+  document_translation_missing: TEMPLATE_QUALITY,
+  // BO / structure
   bo_incomplete: TEMPLATE_BO_INCOMPLETE,
+  shareholder_structure_missing: TEMPLATE_STRUCTURE_SUBMIT,
+  loa_invalid: TEMPLATE_LOA_REDRAFT,
+  company_extract_expired: TEMPLATE_BAV_RESUBMIT,
+  // Address / POA
   address_inconsistency: TEMPLATE_ADDRESS,
+  poa_name_mismatch_holder: TEMPLATE_ADDRESS,
+  poa_type_unaccepted: TEMPLATE_ADDRESS,
+  // Process / status
+  info_change_reverification: TEMPLATE_INFO_CHANGE,
+  sixty_day_deadline_expired: TEMPLATE_DEADLINE_EXPIRED,
+  pending_threshold_triggered: TEMPLATE_THRESHOLD_TRIGGERED,
+  listings_disbursements_blocked: TEMPLATE_DEADLINE_EXPIRED,
+  // Navigation / scope
+  wrong_marketplace_notification: TEMPLATE_CLARIFICATION,
+  check_performance_notifications: TEMPLATE_CLARIFICATION,
+  vat_not_kyc_scope: TEMPLATE_CLARIFICATION,
+  // Fallback
   unknown: TEMPLATE_CLARIFICATION,
 };
 
