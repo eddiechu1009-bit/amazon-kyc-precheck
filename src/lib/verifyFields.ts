@@ -160,6 +160,8 @@ const companyEnField: FieldSpec = {
   required: true,
   placeholderZh: 'e.g. Example Trading Co., Ltd.',
   placeholderEn: 'e.g. Example Trading Co., Ltd.',
+  hintZh: '與公司設立登記表 / 後台登記名稱完全一致',
+  hintEn: 'Must match the company registration and Seller Central exactly',
 };
 
 const companyRegAddressField: FieldSpec = {
@@ -168,6 +170,10 @@ const companyRegAddressField: FieldSpec = {
   labelEn: 'Registered company address',
   kind: 'address',
   required: true,
+  placeholderZh: 'e.g. 8F., No. XXX Example Rd., District, City',
+  placeholderEn: 'e.g. 8F., No. XXX Example Rd., District, City',
+  hintZh: '要與公司登記文件上登記的地址完全一致',
+  hintEn: 'Must match the registered address on the company extract',
 };
 
 const taxIdField: FieldSpec = {
@@ -176,6 +182,10 @@ const taxIdField: FieldSpec = {
   labelEn: 'Tax ID (Taiwan 8-digit)',
   kind: 'tax_id',
   required: false,
+  placeholderZh: 'e.g. 12345678',
+  placeholderEn: 'e.g. 12345678',
+  hintZh: '台灣公司填統一編號。其他國家可留空。',
+  hintEn: 'Taiwan companies: 8-digit Unified Business Number. Leave blank otherwise.',
   validate: (v) => {
     if (!/^\d{8}$/.test(v)) return '8 digits';
     return undefined;
@@ -188,6 +198,8 @@ const boNameField: FieldSpec = {
   labelEn: 'Beneficial owner / legal rep English name',
   kind: 'text',
   required: true,
+  placeholderZh: 'e.g. GIVEN-NAME SURNAME',
+  placeholderEn: 'e.g. GIVEN-NAME SURNAME',
   hintZh: '姓名拼音,要與身分證 / 公司登記拼法完全一致',
   hintEn: 'Romanized name matching ID and company registration',
 };
@@ -258,6 +270,10 @@ export const docTypes: DocTypeDef[] = [
         labelEn: 'English name on the ID',
         kind: 'text',
         required: true,
+        placeholderZh: 'e.g. GIVEN-NAME SURNAME',
+        placeholderEn: 'e.g. GIVEN-NAME SURNAME',
+        hintZh: '拼音要與公司登記、銀行文件完全一致',
+        hintEn: 'Romanization must match company registration and bank docs',
       },
       {
         id: 'id_number',
@@ -265,6 +281,10 @@ export const docTypes: DocTypeDef[] = [
         labelEn: 'ID / passport number',
         kind: 'number',
         required: true,
+        placeholderZh: 'e.g. A123456789',
+        placeholderEn: 'e.g. A123456789',
+        hintZh: '身分證 / 護照上的號碼',
+        hintEn: 'The number printed on the ID or passport',
       },
       {
         id: 'id_expiry',
@@ -272,6 +292,10 @@ export const docTypes: DocTypeDef[] = [
         labelEn: 'Expiry date (YYYY-MM-DD)',
         kind: 'date',
         required: true,
+        placeholderZh: 'YYYY-MM-DD',
+        placeholderEn: 'YYYY-MM-DD',
+        hintZh: '證件上標示的有效到期日,過期就不能用',
+        hintEn: 'The printed expiry date. Expired IDs are not accepted.',
       },
     ],
   },
