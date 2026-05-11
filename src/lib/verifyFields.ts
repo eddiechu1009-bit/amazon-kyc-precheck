@@ -98,8 +98,8 @@ const ibanField: FieldSpec = {
   labelEn: 'IBAN / bank account number',
   kind: 'iban',
   required: true,
-  placeholderZh: 'e.g. NL58 ABNA 0567 0865 42',
-  placeholderEn: 'e.g. NL58 ABNA 0567 0865 42',
+  placeholderZh: 'e.g. GB29 NWBK 6016 1331 9268 19',
+  placeholderEn: 'e.g. GB29 NWBK 6016 1331 9268 19',
   hintZh: '可以留空格,會自動清理',
   hintEn: 'Spaces OK, will be stripped',
   validate: (v) => {
@@ -116,8 +116,8 @@ const issueDateField: FieldSpec = {
   labelEn: 'Issue date (YYYY-MM-DD)',
   kind: 'date',
   required: true,
-  placeholderZh: '2026-04-28',
-  placeholderEn: '2026-04-28',
+  placeholderZh: 'YYYY-MM-DD',
+  placeholderEn: 'YYYY-MM-DD',
   hintZh: '文件上的日期,對帳單 / 證明信 / 帳單都需要',
   hintEn: 'The date on the document itself',
   validate: (v) => {
@@ -134,8 +134,8 @@ const holderNameField: FieldSpec = {
   labelEn: 'Account holder / company full name',
   kind: 'text',
   required: true,
-  placeholderZh: 'e.g. NUNA International B.V.',
-  placeholderEn: 'e.g. NUNA International B.V.',
+  placeholderZh: 'e.g. Example Trading Ltd.',
+  placeholderEn: 'e.g. Example Trading Ltd.',
   hintZh: '和 Seller Central 後台登記的名稱完全一致',
   hintEn: 'Must match exactly what is in Seller Central',
 };
@@ -146,8 +146,8 @@ const holderAddressField: FieldSpec = {
   labelEn: 'Holder residential address',
   kind: 'address',
   required: true,
-  placeholderZh: 'e.g. Room 02, 8F., No. 433 Ruiguang Rd., Neihu Dist., Taipei',
-  placeholderEn: 'e.g. Room 02, 8F., No. 433 Ruiguang Rd., Neihu Dist., Taipei',
+  placeholderZh: 'e.g. Room XX, Building YY, #123 Example Rd., District, City',
+  placeholderEn: 'e.g. Room XX, Building YY, #123 Example Rd., District, City',
   hintZh: '英文地址為準,要與後台完全一致',
   hintEn: 'English address exactly as in Seller Central',
 };
@@ -158,8 +158,8 @@ const companyEnField: FieldSpec = {
   labelEn: 'Company English name',
   kind: 'text',
   required: true,
-  placeholderZh: 'e.g. Wonderland International Co., Ltd.',
-  placeholderEn: 'e.g. Wonderland International Co., Ltd.',
+  placeholderZh: 'e.g. Example Trading Co., Ltd.',
+  placeholderEn: 'e.g. Example Trading Co., Ltd.',
 };
 
 const companyRegAddressField: FieldSpec = {
@@ -213,8 +213,8 @@ export const docTypes: DocTypeDef[] = [
         labelEn: 'Bank full name',
         kind: 'text',
         required: true,
-        placeholderZh: 'e.g. ABN AMRO Bank',
-        placeholderEn: 'e.g. ABN AMRO Bank',
+        placeholderZh: 'e.g. Example Bank plc',
+        placeholderEn: 'e.g. Example Bank plc',
         hintZh: '文件上有沒有出現銀行正式名稱',
         hintEn: 'Whether the bank name appears on the document',
       },
