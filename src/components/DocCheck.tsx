@@ -3,76 +3,88 @@ import { useT } from '../i18n';
 import { extractPdfText, rasterizePdfPages } from '../lib/pdf';
 import { ocrImage, type OcrProgress } from '../lib/ocr';
 import {
-  buildFindings,
   crossCheck,
-  extractFields,
-  guessDocType,
+  docTypeById,
+  docTypes,
+  verifyAgainstOcr,
+  type CrossDocFinding,
   type DocType,
-  type ExtractedFields,
-  type FindingItem,
-} from '../lib/fieldExtract';
+  type FieldSpec,
+  type VerifyFinding,
+  type VerifyReport,
+} from '../lib/verifyFields';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 const ACCEPT = '.pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png';
 
-type DocStatus = 'queued' | 'reading' | 'ocr' | 'done' | 'error';
+type DocStatus = 'idle' | 'reading' | 'ocr' | 'done' | 'error';
 
 interface DocEntry {
   id: string;
-  file: File;
+  docType: DocType;
+  /** Seller-provided field values, keyed by FieldSpec.id */
+  values: Record<string, string>;
+  file?: File;
   status: DocStatus;
   progress?: number;
   progressLabel?: string;
   rawText?: string;
-  docType?: DocType;
-  fields?: ExtractedFields;
-  findings?: FindingItem[];
-  errorMessage?: string;
+  report?: VerifyReport;
   usedOcr?: boolean;
+  errorMessage?: string;
 }
 
 const uid = () => Math.random().toString(36).slice(2, 9);
 
+const newDoc = (docType: DocType): DocEntry => ({
+  id: uid(),
+  docType,
+  values: {},
+  status: 'idle',
+});
+
 export default function DocCheck() {
   const { t, lang } = useT();
   const [docs, setDocs] = useState<DocEntry[]>([]);
-  const [dragOver, setDragOver] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
 
-  const readyDocs = useMemo(
-    () => docs.filter((d) => d.status === 'done' && d.fields),
-    [docs],
-  );
-  const crossFindings = useMemo(
+  const readyDocs = useMemo(() => docs.filter((d) => d.status === 'done'), [docs]);
+
+  const crossFindings = useMemo<CrossDocFinding[]>(
     () =>
       readyDocs.length >= 2
-        ? crossCheck(readyDocs.map((d) => ({ docType: d.docType ?? 'unknown', fields: d.fields! })))
+        ? crossCheck(readyDocs.map((d) => ({ docType: d.docType, values: d.values })))
         : [],
     [readyDocs],
   );
-
-  const onFiles = useCallback(async (files: FileList | File[]) => {
-    const incoming: DocEntry[] = [];
-    for (const f of Array.from(files)) {
-      if (f.size > MAX_FILE_SIZE) continue;
-      incoming.push({ id: uid(), file: f, status: 'queued' });
-    }
-    if (incoming.length === 0) return;
-    setDocs((prev) => [...prev, ...incoming]);
-    for (const d of incoming) {
-      processOne(d.id, d.file);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   const updateDoc = (id: string, patch: Partial<DocEntry>) => {
     setDocs((prev) => prev.map((d) => (d.id === id ? { ...d, ...patch } : d)));
   };
 
-  async function processOne(id: string, file: File) {
-    try {
-      updateDoc(id, { status: 'reading', progress: 0, progressLabel: 'reading' });
+  const setField = (id: string, fieldId: string, value: string) => {
+    setDocs((prev) =>
+      prev.map((d) => {
+        if (d.id !== id) return d;
+        const nextValues = { ...d.values, [fieldId]: value };
+        // Re-run verification on the fly if OCR is already done
+        const nextReport = d.rawText
+          ? verifyAgainstOcr(d.docType, nextValues, d.rawText)
+          : undefined;
+        return { ...d, values: nextValues, report: nextReport };
+      }),
+    );
+  };
 
+  const removeDoc = (id: string) => setDocs((prev) => prev.filter((d) => d.id !== id));
+  const clearAll = () => setDocs([]);
+
+  const addDoc = (docType: DocType) => {
+    setDocs((prev) => [...prev, newDoc(docType)]);
+  };
+
+  async function runOcrFor(entry: DocEntry, file: File) {
+    updateDoc(entry.id, { file, status: 'reading', progress: 0, progressLabel: 'reading' });
+    try {
       let rawText = '';
       let usedOcr = false;
       const isPdf = /\.pdf$/i.test(file.name) || file.type === 'application/pdf';
@@ -81,14 +93,13 @@ export default function DocCheck() {
         const pdf = await extractPdfText(file);
         rawText = pdf.fullText;
         if (pdf.probablyScanned) {
-          // OCR fallback: rasterize → tesseract
-          updateDoc(id, { status: 'ocr', progress: 0, progressLabel: 'rasterize' });
+          updateDoc(entry.id, { status: 'ocr', progress: 0, progressLabel: 'rasterize' });
           const pages = await rasterizePdfPages(file, {
             scale: 2.0,
             maxPages: 3,
             onProgress: ({ page, total }) => {
-              updateDoc(id, {
-                progress: (page / total) * 0.3, // 0..30%
+              updateDoc(entry.id, {
+                progress: (page / total) * 0.3,
                 progressLabel: `rasterizing ${page}/${total}`,
               });
             },
@@ -96,141 +107,78 @@ export default function DocCheck() {
           usedOcr = true;
           const pageTexts: string[] = [];
           for (let i = 0; i < pages.length; i++) {
-            const result = await ocrImage(pages[i], (p: OcrProgress) => {
+            const res = await ocrImage(pages[i], (p: OcrProgress) => {
               const base = 0.3 + (i / pages.length) * 0.7;
               const share = (1 / pages.length) * 0.7;
-              updateDoc(id, {
+              updateDoc(entry.id, {
                 progress: base + p.progress * share,
                 progressLabel: `${p.status} (${i + 1}/${pages.length})`,
               });
             });
-            pageTexts.push(result.text);
+            pageTexts.push(res.text);
           }
           rawText = pageTexts.join('\n\n');
         }
       } else {
-        // Image → OCR directly
         usedOcr = true;
-        updateDoc(id, { status: 'ocr', progress: 0, progressLabel: 'OCR' });
-        const result = await ocrImage(file, (p: OcrProgress) => {
-          updateDoc(id, { progress: p.progress, progressLabel: p.status });
+        updateDoc(entry.id, { status: 'ocr', progress: 0, progressLabel: 'OCR' });
+        const res = await ocrImage(file, (p: OcrProgress) => {
+          updateDoc(entry.id, { progress: p.progress, progressLabel: p.status });
         });
-        rawText = result.text;
+        rawText = res.text;
       }
 
-      const docType = guessDocType(rawText);
-      const fields = extractFields(rawText);
-      const findings = buildFindings(docType, fields, rawText);
-      updateDoc(id, {
-        status: 'done',
-        rawText,
-        docType,
-        fields,
-        findings,
-        usedOcr,
+      // Pull latest values from state to verify against
+      setDocs((prev) => {
+        return prev.map((d) => {
+          if (d.id !== entry.id) return d;
+          const report = verifyAgainstOcr(d.docType, d.values, rawText);
+          return { ...d, rawText, report, usedOcr, status: 'done', progress: 1 };
+        });
       });
     } catch (err: any) {
       console.error(err);
-      updateDoc(id, {
-        status: 'error',
-        errorMessage: err?.message ?? 'unknown error',
-      });
+      updateDoc(entry.id, { status: 'error', errorMessage: err?.message ?? 'unknown error' });
     }
   }
 
-  /** Override the holder or address after OCR; re-run findings. */
-  const overrideField = (
-    id: string,
-    patch: { accountHolder?: string; bestAddress?: string },
-  ) => {
-    setDocs((prev) =>
-      prev.map((d) => {
-        if (d.id !== id || !d.fields) return d;
-        const nextFields: ExtractedFields = { ...d.fields, ...patch };
-        const nextFindings = buildFindings(
-          d.docType ?? 'unknown',
-          nextFields,
-          d.rawText ?? '',
-        );
-        return { ...d, fields: nextFields, findings: nextFindings };
-      }),
-    );
-  };
+  const onFile = useCallback(
+    async (entryId: string, files: FileList | File[]) => {
+      const arr = Array.from(files);
+      if (!arr[0]) return;
+      const file = arr[0];
+      if (file.size > MAX_FILE_SIZE) return;
+      const entry = docs.find((d) => d.id === entryId);
+      if (!entry) return;
+      await runOcrFor(entry, file);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [docs],
+  );
 
-  const removeDoc = (id: string) => {
-    setDocs((prev) => prev.filter((d) => d.id !== id));
-  };
-  const clearAll = () => setDocs([]);
+  // Empty state: doc-type picker
+  if (docs.length === 0) {
+    return <TypePicker onPick={(t) => addDoc(t)} />;
+  }
 
   return (
     <div className="max-w-3xl mx-auto animate-fadeIn pb-8">
-      {/* Drop zone */}
-      <div
-        onDragOver={(e) => {
-          e.preventDefault();
-          setDragOver(true);
-        }}
-        onDragLeave={() => setDragOver(false)}
-        onDrop={(e) => {
-          e.preventDefault();
-          setDragOver(false);
-          if (e.dataTransfer.files) onFiles(e.dataTransfer.files);
-        }}
-        onClick={() => inputRef.current?.click()}
-        className={`relative bg-white rounded-2xl border-2 border-dashed p-6 sm:p-8 text-center cursor-pointer
-          transition-all duration-200 ${
-            dragOver
-              ? 'border-amazon-orange bg-orange-50 scale-[1.01]'
-              : 'border-gray-200 hover:border-amazon-orange/60 hover:bg-orange-50/30'
-          }`}
-      >
-        <input
-          ref={inputRef}
-          type="file"
-          accept={ACCEPT}
-          multiple
-          className="hidden"
-          onChange={(e) => {
-            if (e.target.files) onFiles(e.target.files);
-            e.target.value = '';
-          }}
-        />
-        <div className="text-3xl mb-2 animate-float">📄</div>
-        <div className="text-base sm:text-lg font-semibold text-amazon-dark">
-          {t('docCheckTitle')}
-        </div>
-        <p className="text-xs sm:text-sm text-gray-500 mt-1.5 leading-relaxed max-w-md mx-auto">
-          {t('docCheckDesc')}
-        </p>
-        <div className="mt-5 inline-flex flex-col items-center gap-1">
-          <div className="inline-flex items-center gap-2 text-sm font-semibold text-amazon-orange">
-            <span>⬆</span>
-            <span>{t('docCheckDropZone')}</span>
-          </div>
-          <div className="text-[11px] text-gray-400">{t('docCheckDropHint')}</div>
-        </div>
-        <div className="mt-4 inline-flex items-center gap-1.5 text-[11px] text-amazon-success bg-amazon-success/10 border border-amazon-success/20 rounded-full px-2.5 py-1">
-          <span className="w-1.5 h-1.5 bg-amazon-success rounded-full animate-pulse" />
-          <span>{t('privacyBadge')}</span>
-        </div>
-      </div>
-
-      {docs.length > 0 && (
-        <div className="mt-5 flex items-center justify-between">
-          <div className="text-xs text-gray-500">
-            {readyDocs.length} / {docs.length} — {lang === 'zh' ? '分析完成' : 'analyzed'}
-          </div>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-base font-semibold text-amazon-dark">
+          {lang === 'zh' ? '📄 文件自檢' : '📄 Document check'}
+        </h2>
+        <div className="flex items-center gap-3">
           <button
             onClick={clearAll}
             className="text-xs text-gray-400 hover:text-amazon-warning transition"
           >
-            {t('docCheckClearAll')}
+            {t('docCheckStartFresh')}
           </button>
         </div>
-      )}
+      </div>
 
       {crossFindings.length > 0 && (
-        <section className="mt-4 bg-white rounded-2xl border border-gray-100 shadow-card p-5">
+        <section className="mb-4 bg-white rounded-2xl border border-gray-100 shadow-card p-5">
           <div className="flex items-center gap-2 mb-3">
             <span>🔗</span>
             <h3 className="text-base font-semibold text-amazon-dark">
@@ -239,274 +187,349 @@ export default function DocCheck() {
           </div>
           <ul className="space-y-2">
             {crossFindings.map((f, i) => (
-              <FindingRow key={i} level={f.level} title={t(f.titleKey as any)} detail={f.detail} />
+              <FindingRow
+                key={i}
+                level={f.level as any}
+                title={t(f.titleKey as any)}
+                detail={f.detail}
+              />
             ))}
           </ul>
         </section>
       )}
 
-      <div className="mt-4 space-y-3">
-        {docs.map((doc) => (
+      <div className="space-y-4">
+        {docs.map((doc, i) => (
           <DocCard
             key={doc.id}
             doc={doc}
+            index={i}
+            onFieldChange={(fieldId, value) => setField(doc.id, fieldId, value)}
+            onFile={(files) => onFile(doc.id, files)}
             onRemove={() => removeDoc(doc.id)}
-            onOverride={(patch) => overrideField(doc.id, patch)}
           />
         ))}
       </div>
+
+      <div className="mt-5">
+        <AddAnother onPick={(t) => addDoc(t)} />
+      </div>
+    </div>
+  );
+}
+
+// ======================================================================
+// Sub-components
+// ======================================================================
+
+function TypePicker({ onPick }: { onPick: (t: DocType) => void }) {
+  const { t, tx } = useT();
+  return (
+    <div className="max-w-3xl mx-auto animate-fadeIn">
+      <div className="bg-white rounded-2xl shadow-card border border-gray-100 p-5 sm:p-7">
+        <h2 className="text-lg sm:text-xl font-bold text-amazon-dark leading-snug">
+          {t('docCheckChooseType')}
+        </h2>
+        <p className="text-xs sm:text-sm text-gray-500 mt-1.5 leading-relaxed">
+          {t('docCheckChooseTypeDesc')}
+        </p>
+
+        <div className="mt-5 grid sm:grid-cols-2 gap-3">
+          {docTypes.map((dt) => (
+            <button
+              key={dt.id}
+              onClick={() => onPick(dt.id)}
+              className="text-left bg-gradient-to-br from-gray-50 to-white border border-gray-200 rounded-xl p-4
+                hover:border-amazon-orange hover:shadow-card-hover hover:-translate-y-0.5 transition-all duration-200"
+            >
+              <div className="flex items-start gap-3">
+                <div className="text-2xl">{dt.icon}</div>
+                <div className="min-w-0">
+                  <div className="font-semibold text-amazon-dark text-sm">
+                    {tx({ zh: dt.titleZh, en: dt.titleEn })}
+                  </div>
+                  <div className="text-[11px] text-gray-500 mt-0.5 leading-relaxed">
+                    {tx({ zh: dt.descZh, en: dt.descEn })}
+                  </div>
+                </div>
+              </div>
+            </button>
+          ))}
+        </div>
+
+        <div className="mt-4 inline-flex items-center gap-1.5 text-[11px] text-amazon-success bg-amazon-success/10 border border-amazon-success/20 rounded-full px-2.5 py-1">
+          <span className="w-1.5 h-1.5 bg-amazon-success rounded-full animate-pulse" />
+          <span>{t('privacyBadge')}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function AddAnother({ onPick }: { onPick: (t: DocType) => void }) {
+  const { t, tx } = useT();
+  const [open, setOpen] = useState(false);
+  if (!open) {
+    return (
+      <button
+        onClick={() => setOpen(true)}
+        className="w-full text-sm rounded-xl border border-dashed border-gray-300 text-gray-600
+          py-3 hover:border-amazon-orange hover:text-amazon-orange transition"
+      >
+        + {t('docCheckAddMoreDoc')}
+      </button>
+    );
+  }
+  return (
+    <div className="bg-white rounded-xl border border-gray-200 p-3 animate-fadeIn">
+      <div className="grid sm:grid-cols-2 gap-2">
+        {docTypes.map((dt) => (
+          <button
+            key={dt.id}
+            onClick={() => {
+              onPick(dt.id);
+              setOpen(false);
+            }}
+            className="text-left flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 transition"
+          >
+            <span className="text-xl">{dt.icon}</span>
+            <span className="text-xs font-medium text-gray-700">
+              {tx({ zh: dt.titleZh, en: dt.titleEn })}
+            </span>
+          </button>
+        ))}
+      </div>
+      <button
+        onClick={() => setOpen(false)}
+        className="mt-1 w-full text-[11px] text-gray-400 hover:text-gray-600"
+      >
+        ×
+      </button>
     </div>
   );
 }
 
 function DocCard({
   doc,
+  index,
+  onFieldChange,
+  onFile,
   onRemove,
-  onOverride,
 }: {
   doc: DocEntry;
+  index: number;
+  onFieldChange: (fieldId: string, value: string) => void;
+  onFile: (files: FileList | File[]) => void;
   onRemove: () => void;
-  onOverride: (patch: { accountHolder?: string; bestAddress?: string }) => void;
 }) {
-  const { t, lang } = useT();
-  const [expanded, setExpanded] = useState(true);
+  const { t, tx, lang } = useT();
+  const [dragOver, setDragOver] = useState(false);
   const [showRaw, setShowRaw] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  const typeLabel = {
-    bank_statement: t('docTypeBank'),
-    company_registration: t('docTypeCompany'),
-    proof_of_address: t('docTypePoa'),
-    id: t('docTypeId'),
-    unknown: t('docTypeUnknown'),
-  }[doc.docType ?? 'unknown'];
+  const def = docTypeById.get(doc.docType)!;
+  const isProcessing = doc.status === 'reading' || doc.status === 'ocr';
 
-  const isImage = /^image\//.test(doc.file.type);
-
-  // Candidates that are NOT currently the selected holder / address
-  const otherNames = useMemo(() => {
-    if (!doc.fields) return [];
-    const current = doc.fields.accountHolder ?? '';
-    return doc.fields.nameCandidates.filter(
-      (n) => n.value.toUpperCase() !== current.toUpperCase(),
-    );
-  }, [doc.fields]);
-
-  const otherAddresses = useMemo(() => {
-    if (!doc.fields) return [];
-    const current = doc.fields.bestAddress ?? '';
-    return doc.fields.addressCandidates.filter((a) => a.value !== current);
-  }, [doc.fields]);
+  const requiredFilled = def.fields
+    .filter((f) => f.required)
+    .every((f) => (doc.values[f.id] ?? '').trim().length > 0);
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-card overflow-hidden transition-all">
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-card overflow-hidden">
       {/* Header */}
-      <div className="flex items-start gap-3 p-4">
-        <div
-          className={`flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center text-lg ${
-            doc.status === 'done'
-              ? 'bg-amazon-success/10 text-amazon-success'
-              : doc.status === 'error'
-              ? 'bg-amazon-danger/10 text-amazon-danger'
-              : 'bg-amazon-blue/10 text-amazon-blue'
-          }`}
-        >
-          {isImage ? '🖼️' : '📄'}
+      <div className="flex items-start gap-3 p-4 sm:p-5 border-b border-gray-100">
+        <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-amazon-blue/10 text-amazon-blue flex items-center justify-center text-lg">
+          {def.icon}
         </div>
         <div className="flex-1 min-w-0">
-          <div className="flex flex-wrap items-start gap-2">
-            <div className="font-semibold text-sm text-amazon-dark truncate" title={doc.file.name}>
-              {doc.file.name}
-            </div>
-            {doc.status === 'done' && doc.docType && (
-              <span
-                className={`text-[10px] font-medium px-2 py-0.5 rounded-full border ${
-                  doc.docType === 'unknown'
-                    ? 'text-gray-500 border-gray-200 bg-gray-50'
-                    : 'text-amazon-blue border-amazon-blue/30 bg-amazon-blue/5'
-                }`}
-              >
-                {typeLabel}
-              </span>
-            )}
-            {doc.usedOcr && (
-              <span className="text-[10px] font-medium px-2 py-0.5 rounded-full border text-amber-700 border-amber-200 bg-amber-50">
-                OCR
-              </span>
-            )}
+          <div className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">
+            {t('docCheckDocType')} #{index + 1}
           </div>
-          <div className="text-[11px] text-gray-400 mt-0.5">
-            {(doc.file.size / 1024).toFixed(0)} KB
+          <div className="font-semibold text-amazon-dark">
+            {tx({ zh: def.titleZh, en: def.titleEn })}
           </div>
-
-          {(doc.status === 'reading' || doc.status === 'ocr') && (
-            <div className="mt-2">
-              <div className="flex items-center justify-between text-[11px] text-gray-500 mb-1">
-                <span className="truncate pr-2">
-                  {doc.progressLabel ?? t('docCheckProcessing')}
-                </span>
-                {doc.progress !== undefined && (
-                  <span className="font-mono flex-shrink-0">{Math.round(doc.progress * 100)}%</span>
-                )}
-              </div>
-              <div className="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
-                <div
-                  className="h-1.5 bg-gradient-to-r from-amazon-orange to-yellow-400 transition-all duration-300"
-                  style={{ width: `${Math.max(8, (doc.progress ?? 0) * 100)}%` }}
-                />
-              </div>
-            </div>
-          )}
-
-          {doc.status === 'error' && (
-            <div className="mt-2 text-xs text-amazon-danger bg-red-50 border border-red-100 rounded-lg px-2.5 py-1.5">
-              {t('docCheckError')}
-              {doc.errorMessage && <span className="text-gray-500"> — {doc.errorMessage}</span>}
-            </div>
-          )}
+          <div className="text-[11px] text-gray-500 mt-0.5">
+            {tx({ zh: def.descZh, en: def.descEn })}
+          </div>
         </div>
         <button
           onClick={onRemove}
-          className="text-gray-400 hover:text-amazon-warning transition text-lg leading-none px-1"
+          className="text-gray-400 hover:text-amazon-warning text-xl leading-none px-1"
           aria-label="remove"
         >
           ×
         </button>
       </div>
 
-      {/* Body */}
-      {doc.status === 'done' && doc.fields && (
-        <>
-          <button
-            onClick={() => setExpanded(!expanded)}
-            className="w-full px-4 py-2 text-[11px] text-amazon-orange font-medium border-t border-gray-100 hover:bg-orange-50/50 transition inline-flex items-center justify-center gap-1"
+      {/* Fields */}
+      <div className="p-4 sm:p-5">
+        <div className="mb-3">
+          <div className="text-sm font-semibold text-amazon-dark">
+            {t('docCheckFillFields')}
+          </div>
+          <p className="text-[11px] text-gray-500 mt-0.5 leading-relaxed">
+            {t('docCheckFillHint')}
+          </p>
+        </div>
+
+        <div className="space-y-3">
+          {def.fields.map((field) => (
+            <FieldInput
+              key={field.id}
+              field={field}
+              value={doc.values[field.id] ?? ''}
+              onChange={(v) => onFieldChange(field.id, v)}
+              finding={
+                doc.report?.fields.find((fr) => fr.fieldId === field.id)?.findings[
+                  doc.report?.fields.find((fr) => fr.fieldId === field.id)?.findings.length! - 1
+                ]
+              }
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* File upload / progress */}
+      <div className="px-4 sm:px-5 pb-4 sm:pb-5">
+        {!doc.file && (
+          <div
+            onDragOver={(e) => {
+              e.preventDefault();
+              setDragOver(true);
+            }}
+            onDragLeave={() => setDragOver(false)}
+            onDrop={(e) => {
+              e.preventDefault();
+              setDragOver(false);
+              if (e.dataTransfer.files) onFile(e.dataTransfer.files);
+            }}
+            onClick={() => inputRef.current?.click()}
+            className={`relative rounded-xl border-2 border-dashed p-5 text-center cursor-pointer transition-all duration-200 ${
+              !requiredFilled
+                ? 'border-gray-200 bg-gray-50 text-gray-400'
+                : dragOver
+                ? 'border-amazon-orange bg-orange-50 scale-[1.005]'
+                : 'border-amazon-orange/40 bg-orange-50/30 hover:border-amazon-orange hover:bg-orange-50'
+            }`}
           >
-            <span>
-              {expanded
-                ? lang === 'zh' ? '收合細節' : 'Collapse details'
-                : lang === 'zh' ? '展開辨識內容與檢查結果' : 'Show extracted fields & findings'}
-            </span>
-            <span className={`transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`}>▾</span>
-          </button>
+            <input
+              ref={inputRef}
+              type="file"
+              accept={ACCEPT}
+              className="hidden"
+              onChange={(e) => {
+                if (e.target.files) onFile(e.target.files);
+                e.target.value = '';
+              }}
+            />
+            <div className="text-2xl mb-1">⬆</div>
+            <div className="text-sm font-semibold">
+              {requiredFilled
+                ? t('docCheckAddDoc')
+                : lang === 'zh'
+                ? '請先填必填欄位再上傳'
+                : 'Fill required fields first'}
+            </div>
+            <div className="text-[11px] text-gray-400 mt-1">{t('docCheckDropHint')}</div>
+          </div>
+        )}
 
-          {expanded && (
-            <div className="px-4 pb-4 pt-0 animate-slideDown border-t border-gray-100">
-              <div className="grid sm:grid-cols-2 gap-4 mt-3">
-                {/* Extracted */}
-                <div>
-                  <div className="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-2">
-                    {t('docCheckExtracted')}
-                  </div>
-                  <dl className="text-xs space-y-1.5 text-gray-700">
-                    <Field label={t('docFieldHolder')} value={doc.fields.accountHolder} />
-                    <Field label={t('docFieldIban')} value={doc.fields.iban} mono />
-                    <Field label={t('docFieldBic')} value={doc.fields.bic} mono />
-                    <Field label={t('docFieldAccountNumber')} value={doc.fields.accountNumber} mono />
-                    <Field label={t('docFieldTaxId')} value={doc.fields.taiwanTaxId} mono />
-                    <Field label={t('docFieldDate')} value={doc.fields.issueDate} mono />
-                    <Field label={t('docFieldAddress')} value={doc.fields.bestAddress} multiline />
-                  </dl>
-                </div>
-                {/* Findings */}
-                <div>
-                  <div className="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-2">
-                    {t('docCheckFindings')}
-                  </div>
-                  <ul className="space-y-2">
-                    {(doc.findings ?? []).map((f, i) => (
-                      <FindingRow
-                        key={i}
-                        level={f.level}
-                        title={t(f.titleKey as any)}
-                        detail={f.detail}
-                      />
-                    ))}
-                  </ul>
-                </div>
+        {doc.file && (
+          <div className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs flex items-center gap-2">
+            <span className="text-lg">{/^image\//.test(doc.file.type) ? '🖼️' : '📄'}</span>
+            <div className="flex-1 min-w-0">
+              <div className="font-medium text-gray-800 truncate">{doc.file.name}</div>
+              <div className="text-[10px] text-gray-400">{(doc.file.size / 1024).toFixed(0)} KB</div>
+            </div>
+            {doc.usedOcr && (
+              <span className="text-[10px] font-medium px-2 py-0.5 rounded-full border text-amber-700 border-amber-200 bg-amber-50">
+                OCR
+              </span>
+            )}
+            <button
+              onClick={() => inputRef.current?.click()}
+              className="text-[11px] text-amazon-orange hover:underline"
+            >
+              {t('docCheckReplaceFile')}
+            </button>
+            <input
+              ref={inputRef}
+              type="file"
+              accept={ACCEPT}
+              className="hidden"
+              onChange={(e) => {
+                if (e.target.files) onFile(e.target.files);
+                e.target.value = '';
+              }}
+            />
+          </div>
+        )}
+
+        {isProcessing && (
+          <div className="mt-3">
+            <div className="flex items-center justify-between text-[11px] text-gray-500 mb-1">
+              <span className="truncate pr-2">
+                {doc.progressLabel ?? t('docCheckProcessing')}
+              </span>
+              {doc.progress !== undefined && (
+                <span className="font-mono">{Math.round(doc.progress * 100)}%</span>
+              )}
+            </div>
+            <div className="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
+              <div
+                className="h-1.5 bg-gradient-to-r from-amazon-orange to-yellow-400 transition-all duration-300"
+                style={{ width: `${Math.max(8, (doc.progress ?? 0) * 100)}%` }}
+              />
+            </div>
+          </div>
+        )}
+
+        {doc.status === 'error' && (
+          <div className="mt-3 text-xs text-amazon-danger bg-red-50 border border-red-100 rounded-lg px-2.5 py-1.5">
+            {t('docCheckError')}
+            {doc.errorMessage && <span className="text-gray-500"> — {doc.errorMessage}</span>}
+          </div>
+        )}
+      </div>
+
+      {/* Report summary */}
+      {doc.status === 'done' && doc.report && (
+        <>
+          <div className="px-4 sm:px-5 py-3 border-t border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+            <div className="flex items-center justify-between text-xs">
+              <span className="font-semibold text-gray-700">
+                {t('docCheckScorePct')}: {doc.report.scorePct}%
+              </span>
+              <div className="flex items-center gap-2">
+                <Chip level="ok" count={doc.report.okCount} />
+                <Chip level="warn" count={doc.report.warnCount} />
+                <Chip level="fail" count={doc.report.failCount} />
               </div>
+            </div>
+            <div className="mt-1.5 w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
+              <div
+                className="h-1.5 bg-gradient-to-r from-amazon-success to-green-400 transition-all duration-500"
+                style={{ width: `${doc.report.scorePct}%` }}
+              />
+            </div>
+          </div>
 
-              {/* Candidate override: names */}
-              {otherNames.length > 0 && (
-                <div className="mt-4 pt-3 border-t border-dashed border-gray-200">
-                  <div className="text-[11px] font-semibold text-gray-500 uppercase tracking-wide">
-                    {t('docCandidatesTitle')}
-                  </div>
-                  <p className="text-[11px] text-gray-500 mt-0.5 leading-relaxed">
-                    {t('docCandidatesHint')}
-                  </p>
-                  <div className="mt-2 flex flex-wrap gap-1.5">
-                    {otherNames.map((n) => (
-                      <button
-                        key={n.value}
-                        onClick={() => onOverride({ accountHolder: n.value })}
-                        className={`text-[11px] px-2.5 py-1 rounded-full border transition inline-flex items-center gap-1.5
-                          ${
-                            n.likelyBank
-                              ? 'bg-gray-50 border-gray-200 text-gray-500 hover:border-amazon-orange/50'
-                              : 'bg-white border-gray-300 text-gray-800 hover:border-amazon-orange hover:bg-orange-50'
-                          }`}
-                        title={n.likelyBank ? 'Detected as a bank name' : ''}
-                      >
-                        <span>{n.value}</span>
-                        {n.likelyBank && (
-                          <span className="text-[9px] uppercase tracking-wider text-amber-700 bg-amber-100 border border-amber-200 rounded px-1 py-0">
-                            {t('docCandidateBankHint')}
-                          </span>
-                        )}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Candidate override: addresses */}
-              {otherAddresses.length > 0 && (
-                <div className="mt-4 pt-3 border-t border-dashed border-gray-200">
-                  <div className="text-[11px] font-semibold text-gray-500 uppercase tracking-wide">
-                    {t('docCandidateAddressTitle')}
-                  </div>
-                  <p className="text-[11px] text-gray-500 mt-0.5 leading-relaxed">
-                    {t('docCandidateAddressHint')}
-                  </p>
-                  <div className="mt-2 space-y-1.5">
-                    {otherAddresses.map((a, i) => (
-                      <button
-                        key={i}
-                        onClick={() => onOverride({ bestAddress: a.value })}
-                        className={`w-full text-left text-[11px] px-2.5 py-1.5 rounded-lg border transition
-                          ${
-                            a.likelyBankAddress
-                              ? 'bg-gray-50 border-gray-200 text-gray-500 hover:border-amazon-orange/50'
-                              : 'bg-white border-gray-300 text-gray-700 hover:border-amazon-orange hover:bg-orange-50'
-                          }`}
-                      >
-                        <span>{a.value}</span>
-                        {a.likelyBankAddress && (
-                          <span className="ml-1.5 text-[9px] uppercase tracking-wider text-amber-700 bg-amber-100 border border-amber-200 rounded px-1 py-0">
-                            {t('docCandidateBankHint')}
-                          </span>
-                        )}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Raw OCR text (for transparency) */}
-              {doc.usedOcr && doc.rawText && (
-                <div className="mt-4 pt-3 border-t border-dashed border-gray-200">
-                  <button
-                    onClick={() => setShowRaw(!showRaw)}
-                    className="text-[11px] text-amazon-orange hover:underline inline-flex items-center gap-1"
-                  >
-                    <span>{showRaw ? t('docHideRawOcr') : t('docShowRawOcr')}</span>
-                    <span className={`transition-transform ${showRaw ? 'rotate-180' : ''}`}>▾</span>
-                  </button>
-                  {showRaw && (
-                    <pre className="mt-2 bg-gray-50 border border-gray-200 rounded-lg p-3 text-[11px] text-gray-700 whitespace-pre-wrap max-h-80 overflow-y-auto scrollbar-thin font-mono leading-relaxed">
+          {doc.usedOcr && doc.rawText && (
+            <div className="px-4 sm:px-5 pb-4 text-xs">
+              <div className="bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 text-amber-900 leading-relaxed">
+                ⚠️ {t('docCheckOcrUncertain')}
+              </div>
+              <button
+                onClick={() => setShowRaw(!showRaw)}
+                className="mt-2 text-[11px] text-amazon-orange hover:underline inline-flex items-center gap-1"
+              >
+                <span>{showRaw ? t('docCheckHideRawOcr') : t('docCheckShowRawOcr')}</span>
+                <span className={`transition-transform ${showRaw ? 'rotate-180' : ''}`}>▾</span>
+              </button>
+              {showRaw && (
+                <pre className="mt-2 bg-gray-50 border border-gray-200 rounded-lg p-3 text-[11px] text-gray-700 whitespace-pre-wrap max-h-80 overflow-y-auto scrollbar-thin font-mono leading-relaxed">
 {doc.rawText}
-                    </pre>
-                  )}
-                </div>
+                </pre>
               )}
             </div>
           )}
@@ -516,32 +539,112 @@ function DocCard({
   );
 }
 
-function Field({
-  label,
+function FieldInput({
+  field,
   value,
-  mono,
-  multiline,
+  onChange,
+  finding,
 }: {
-  label: string;
-  value?: string;
-  mono?: boolean;
-  multiline?: boolean;
+  field: FieldSpec;
+  value: string;
+  onChange: (v: string) => void;
+  finding: VerifyFinding | undefined;
 }) {
-  if (!value) {
-    return (
-      <div className="flex items-center justify-between gap-2">
-        <dt className="text-gray-400">{label}</dt>
-        <dd className="text-gray-300 italic">—</dd>
-      </div>
-    );
-  }
+  const { t, lang } = useT();
+  const label = lang === 'zh' ? field.labelZh : field.labelEn;
+  const hint = lang === 'zh' ? field.hintZh : field.hintEn;
+  const placeholder = lang === 'zh' ? field.placeholderZh : field.placeholderEn;
+
+  const borderByLevel = !finding
+    ? 'border-gray-200 focus:border-amazon-orange'
+    : finding.level === 'ok'
+    ? 'border-emerald-300 focus:border-emerald-400'
+    : finding.level === 'warn'
+    ? 'border-amber-300 focus:border-amber-400'
+    : finding.level === 'fail'
+    ? 'border-red-300 focus:border-red-400'
+    : 'border-gray-200';
+
+  const isLongField = field.kind === 'address';
+
   return (
-    <div className={multiline ? 'flex flex-col gap-0.5' : 'flex items-center justify-between gap-2'}>
-      <dt className="text-gray-500 flex-shrink-0">{label}</dt>
-      <dd className={`text-gray-800 ${mono ? 'font-mono text-[11px]' : ''} ${multiline ? '' : 'truncate'}`}>
-        {value}
-      </dd>
+    <div>
+      <label className="text-xs font-semibold text-gray-700 flex items-center gap-2">
+        <span>{label}</span>
+        {field.required && <span className="text-[10px] text-red-500">*</span>}
+      </label>
+      {hint && <p className="text-[11px] text-gray-400 mt-0.5 leading-relaxed">{hint}</p>}
+      {isLongField ? (
+        <textarea
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          rows={2}
+          className={`mt-1.5 w-full rounded-lg border-2 ${borderByLevel} px-3 py-2 text-sm outline-none transition focus:ring-4 focus:ring-amazon-orange/10`}
+        />
+      ) : (
+        <input
+          type="text"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          className={`mt-1.5 w-full rounded-lg border-2 ${borderByLevel} px-3 py-2 text-sm outline-none transition focus:ring-4 focus:ring-amazon-orange/10`}
+        />
+      )}
+      {finding && finding.level !== 'skipped' && (
+        <InlineFinding finding={finding} fallbackT={t} />
+      )}
     </div>
+  );
+}
+
+function InlineFinding({
+  finding,
+  fallbackT,
+}: {
+  finding: VerifyFinding;
+  fallbackT: (k: any) => string;
+}) {
+  const style = {
+    ok: 'text-emerald-700 bg-emerald-50 border-emerald-200',
+    warn: 'text-amber-800 bg-amber-50 border-amber-200',
+    fail: 'text-red-700 bg-red-50 border-red-200',
+    skipped: 'text-gray-500 bg-gray-50 border-gray-200',
+  }[finding.level];
+  const icon = { ok: '✅', warn: '⚠️', fail: '❌', skipped: '—' }[finding.level];
+  return (
+    <div className={`mt-1.5 rounded-md border px-2.5 py-1.5 text-[11px] leading-relaxed ${style}`}>
+      <div className="flex items-start gap-1.5">
+        <span className="leading-none">{icon}</span>
+        <div className="flex-1 min-w-0">
+          <div>{fallbackT(finding.titleKey as any)}</div>
+          {finding.detail && <div className="text-gray-600 mt-0.5 font-mono text-[10px]">{finding.detail}</div>}
+          {finding.nearMatch && (
+            <div className="text-gray-700 mt-0.5 font-mono text-[10px]">
+              ≈ <span className="bg-white px-1 rounded">{finding.nearMatch}</span>
+            </div>
+          )}
+          {finding.snippet && (
+            <div className="text-gray-500 mt-0.5 text-[10px] italic truncate">{finding.snippet}</div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Chip({ level, count }: { level: 'ok' | 'warn' | 'fail'; count: number }) {
+  if (count === 0) return null;
+  const style = {
+    ok: 'bg-emerald-100 text-emerald-700',
+    warn: 'bg-amber-100 text-amber-800',
+    fail: 'bg-red-100 text-red-700',
+  }[level];
+  const icon = { ok: '✓', warn: '⚠', fail: '✗' }[level];
+  return (
+    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-mono ${style}`}>
+      {icon} {count}
+    </span>
   );
 }
 
