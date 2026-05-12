@@ -16,7 +16,7 @@
  * If FORMSPREE_ENDPOINT is left empty, the About page will gracefully fall
  * back to showing only the GitHub link — the form is hidden, nothing breaks.
  */
-export const FORMSPREE_ENDPOINT = '';
+export const FORMSPREE_ENDPOINT = 'https://formspree.io/f/xqennqpr';
 
 /** Public GitHub repo URL used as a secondary contact channel. */
 export const GITHUB_REPO_URL = 'https://github.com/eddiechu1009-bit/amazon-kyc-precheck';
