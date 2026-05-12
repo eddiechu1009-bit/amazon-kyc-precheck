@@ -1,5 +1,7 @@
 import { useT } from '../i18n';
 import LanguageSwitcher from './LanguageSwitcher';
+import ContactForm from './ContactForm';
+import { GITHUB_REPO_URL } from '../config/contact';
 
 /**
  * Full disclaimer / attribution page.
@@ -7,7 +9,6 @@ import LanguageSwitcher from './LanguageSwitcher';
  * in the first-time modal and footer.
  */
 
-const GITHUB_REPO_URL = 'https://github.com/eddiechu1009-bit/amazon-kyc-precheck';
 const LAST_UPDATED = '2026-05-12';
 
 interface Props {
@@ -82,12 +83,16 @@ export default function AboutPage({ onBack }: Props) {
             </Section>
 
             <Section title={t('aboutSection6Title')}>
-              <p className="mb-3">{t('aboutSection6Body')}</p>
+              <p className="mb-4">{t('aboutSection6Body')}</p>
+
+              <ContactForm />
+
+              <p className="mt-6 mb-2 text-xs text-gray-500">{t('aboutSection6GithubAlt')}</p>
               <a
                 href={GITHUB_REPO_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-amazon-dark text-white rounded-lg text-sm font-medium hover:bg-gray-800 transition shadow-cta"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 transition"
               >
                 <span aria-hidden>🐙</span>
                 {t('aboutSection6GithubLabel')} ↗
