@@ -1,24 +1,77 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useT } from './i18n';
 import LanguageSwitcher from './components/LanguageSwitcher';
 import PrivacyBadge from './components/PrivacyBadge';
 import Wizard from './components/Wizard';
 import AfterReject from './components/AfterReject';
 import DocCheck from './components/DocCheck';
+import DisclaimerModal, { needsDisclaimerAck } from './components/DisclaimerModal';
+import AboutPage from './components/AboutPage';
 
 type Mode = 'wizard' | 'doc' | 'reject';
+type Route = 'home' | 'about';
+
+function getRouteFromHash(): Route {
+  if (typeof window === 'undefined') return 'home';
+  return window.location.hash === '#/about' ? 'about' : 'home';
+}
 
 export default function App() {
   const { t } = useT();
   const [started, setStarted] = useState(false);
   const [mode, setMode] = useState<Mode>('wizard');
+  const [route, setRoute] = useState<Route>(getRouteFromHash);
+  const [showDisclaimer, setShowDisclaimer] = useState(() => needsDisclaimerAck());
+
+  // Sync route with URL hash so sharing `#/about` works, and back/forward does the right thing.
+  useEffect(() => {
+    const onHashChange = () => setRoute(getRouteFromHash());
+    window.addEventListener('hashchange', onHashChange);
+    return () => window.removeEventListener('hashchange', onHashChange);
+  }, []);
+
+  function navigateTo(next: Route) {
+    if (next === 'about') {
+      window.location.hash = '#/about';
+    } else {
+      // Clear the hash without reloading
+      history.pushState('', document.title, window.location.pathname + window.location.search);
+      setRoute('home');
+    }
+  }
+
+  if (route === 'about') {
+    return <AboutPage onBack={() => navigateTo('home')} />;
+  }
 
   if (!started) {
-    return <Landing onStart={() => setStarted(true)} />;
+    return (
+      <>
+        <Landing onStart={() => setStarted(true)} onOpenAbout={() => navigateTo('about')} />
+        {showDisclaimer && (
+          <DisclaimerModal
+            onAcknowledge={() => setShowDisclaimer(false)}
+            onOpenAboutPage={() => {
+              setShowDisclaimer(false);
+              navigateTo('about');
+            }}
+          />
+        )}
+      </>
+    );
   }
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
+      {showDisclaimer && (
+        <DisclaimerModal
+          onAcknowledge={() => setShowDisclaimer(false)}
+          onOpenAboutPage={() => {
+            setShowDisclaimer(false);
+            navigateTo('about');
+          }}
+        />
+      )}
       <header className="bg-shimmer text-white px-4 py-3 flex items-center justify-between sticky top-0 z-50 shadow-lg">
         <div className="flex items-center gap-3 min-w-0">
           <span className="text-2xl" role="img" aria-label="shield">🛡️</span>
@@ -73,12 +126,12 @@ export default function App() {
         {mode === 'reject' && <AfterReject />}
       </main>
 
-      <Footer />
+      <Footer onOpenAbout={() => navigateTo('about')} />
     </div>
   );
 }
 
-function Landing({ onStart }: { onStart: () => void }) {
+function Landing({ onStart, onOpenAbout }: { onStart: () => void; onOpenAbout: () => void }) {
   const { t } = useT();
   return (
     <div className="min-h-screen bg-shimmer px-4 py-6 sm:py-10 flex items-center">
@@ -162,6 +215,14 @@ function Landing({ onStart }: { onStart: () => void }) {
         <p className="text-center text-[11px] text-white/60 mt-5 leading-relaxed max-w-xl mx-auto">
           {t('sourcesDisclaimer')}
         </p>
+        <div className="text-center mt-2">
+          <button
+            onClick={onOpenAbout}
+            className="text-[11px] text-white/70 hover:text-white underline-offset-2 hover:underline transition"
+          >
+            {t('footerReadFull')}
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -242,10 +303,19 @@ function ModeTab({
   );
 }
 
-function Footer() {
+function Footer({ onOpenAbout }: { onOpenAbout: () => void }) {
   const { t } = useT();
   return (
     <footer className="text-center text-[11px] sm:text-xs text-gray-500 py-6 px-4 border-t mt-auto">
+      <div className="max-w-2xl mx-auto bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 mb-4">
+        <p className="leading-relaxed text-gray-600">{t('footerDisclaimerShort')}</p>
+        <button
+          onClick={onOpenAbout}
+          className="mt-1.5 text-[11px] text-amazon-orange hover:text-amazon-orange-hover font-medium hover:underline transition"
+        >
+          {t('footerReadFull')}
+        </button>
+      </div>
       <p className="max-w-2xl mx-auto leading-relaxed">{t('footerDataSource')}</p>
       <p className="max-w-2xl mx-auto leading-relaxed mt-1">{t('footerPrivacy')}</p>
       <div className="mt-3 text-gray-400 text-[10px] uppercase tracking-wider font-semibold">
