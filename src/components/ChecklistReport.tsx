@@ -143,6 +143,7 @@ export default function ChecklistReport({ items, answers, onEdit }: Props) {
               checked={checked.has(item.id)}
               onToggle={() => toggle(item.id)}
               staggerIndex={i}
+              defaultExpanded={i === 0}
             />
           ))}
         </Section>
@@ -267,38 +268,67 @@ function Card({
   checked,
   onToggle,
   staggerIndex,
+  defaultExpanded = false,
 }: {
   item: ChecklistItem;
   checked: boolean;
   onToggle: () => void;
   staggerIndex: number;
+  defaultExpanded?: boolean;
 }) {
   const { lang, tx } = useT();
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(defaultExpanded);
+
+  const expandLabel = expanded
+    ? lang === 'zh'
+      ? '收合內容'
+      : 'Collapse'
+    : lang === 'zh'
+    ? '查看準備重點與退件原因'
+    : 'See prep tips & rejection reasons';
 
   return (
     <div
-      className={`bg-white rounded-xl border transition-all duration-200 animate-fadeIn stagger-${Math.min(
+      className={`group bg-white rounded-xl border transition-all duration-200 animate-fadeIn stagger-${Math.min(
         staggerIndex + 1,
         5,
       )} ${
         checked
           ? 'border-green-300 bg-green-50/40 shadow-card'
           : expanded
-          ? 'border-amazon-orange/40 shadow-card-hover'
-          : 'border-gray-200 shadow-card hover:shadow-card-hover hover:border-gray-300'
+          ? 'border-amazon-orange/60 shadow-card-hover'
+          : 'border-gray-200 shadow-card hover:shadow-card-hover hover:border-amazon-orange/40 hover:bg-orange-50/20'
       }`}
     >
-      <div className="flex items-start gap-3 p-4">
-        <button
-          onClick={onToggle}
-          className={`flex-shrink-0 mt-0.5 w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all duration-200 ${
+      {/* Clickable header — entire row expands/collapses */}
+      <button
+        type="button"
+        onClick={() => setExpanded(!expanded)}
+        className="w-full text-left p-4 flex items-start gap-3 focus:outline-none focus:ring-2 focus:ring-amazon-orange/30 rounded-xl"
+        aria-expanded={expanded}
+      >
+        {/* Checkbox (swallow click so it doesn't also toggle expand) */}
+        <span
+          role="checkbox"
+          tabIndex={0}
+          aria-checked={checked}
+          aria-label="toggle done"
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggle();
+          }}
+          onKeyDown={(e) => {
+            if (e.key === ' ' || e.key === 'Enter') {
+              e.preventDefault();
+              e.stopPropagation();
+              onToggle();
+            }
+          }}
+          className={`flex-shrink-0 mt-0.5 w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all duration-200 cursor-pointer ${
             checked
               ? 'border-amazon-success bg-amazon-success text-white scale-110'
               : 'border-gray-300 hover:border-amazon-success hover:scale-110'
           }`}
-          aria-label="toggle done"
-          aria-pressed={checked}
         >
           {checked && (
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="animate-checkPop">
@@ -311,12 +341,9 @@ function Card({
               />
             </svg>
           )}
-        </button>
-        <button
-          className="flex-1 min-w-0 text-left focus:outline-none"
-          onClick={() => setExpanded(!expanded)}
-          aria-expanded={expanded}
-        >
+        </span>
+
+        <div className="flex-1 min-w-0">
           <div
             className={`font-semibold text-sm sm:text-[15px] transition-colors ${
               checked ? 'text-gray-500 line-through' : 'text-amazon-dark'
@@ -327,12 +354,32 @@ function Card({
           <div className="text-xs sm:text-sm text-gray-500 mt-0.5 leading-relaxed">
             {tx(item.why)}
           </div>
-          <div className="text-[11px] text-amazon-orange mt-1.5 font-medium inline-flex items-center gap-1">
-            <span>{expanded ? (lang === 'zh' ? '收合' : 'Collapse') : lang === 'zh' ? '展開準備重點與常見退件原因' : 'Show prep tips & rejection reasons'}</span>
-            <span className={`transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`}>▾</span>
-          </div>
-        </button>
-      </div>
+
+          {/* Obvious CTA pill — looks like a real button */}
+          <span
+            className={`inline-flex items-center gap-1.5 mt-2.5 text-xs font-medium px-2.5 py-1 rounded-full border transition-colors ${
+              expanded
+                ? 'bg-amazon-orange text-white border-amazon-orange'
+                : 'bg-orange-50 text-amazon-orange border-amazon-orange/30 group-hover:bg-amazon-orange group-hover:text-white group-hover:border-amazon-orange'
+            }`}
+          >
+            <span>{expandLabel}</span>
+            <span className={`transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`}>
+              ▾
+            </span>
+          </span>
+        </div>
+
+        {/* Right chevron — secondary affordance */}
+        <span
+          aria-hidden
+          className={`flex-shrink-0 mt-1 text-gray-300 group-hover:text-amazon-orange transition-all duration-200 ${
+            expanded ? 'rotate-90 text-amazon-orange' : ''
+          }`}
+        >
+          ›
+        </span>
+      </button>
 
       {expanded && (
         <div className="px-4 pb-4 pt-0 animate-slideDown">

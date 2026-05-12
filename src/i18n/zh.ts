@@ -72,7 +72,7 @@ export const zh = {
 
   // Wizard — Report
   reportTitle: '你的 KYC 文件清單',
-  reportSubtitle: '根據你的回答客製。按住卡片可展開準備重點與常見退件原因。',
+  reportSubtitle: '根據你的回答客製。點任一張卡片展開準備重點與常見退件原因。',
   reportRequired: '必要',
   reportConditional: '視情況',
   reportRecommended: '建議',

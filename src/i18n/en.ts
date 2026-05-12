@@ -75,7 +75,7 @@ export const en: typeof zh = {
 
   // Wizard — Report
   reportTitle: 'Your personalized KYC document checklist',
-  reportSubtitle: 'Tailored to your answers. Click a card to expand prep tips and common rejection reasons.',
+  reportSubtitle: 'Tailored to your answers. Click any card to see prep tips and common rejection reasons.',
   reportRequired: 'Required',
   reportConditional: 'Conditional',
   reportRecommended: 'Recommended',
