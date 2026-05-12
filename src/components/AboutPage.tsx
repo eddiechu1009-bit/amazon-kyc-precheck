@@ -1,7 +1,6 @@
 import { useT } from '../i18n';
 import LanguageSwitcher from './LanguageSwitcher';
 import ContactForm from './ContactForm';
-import { GITHUB_REPO_URL } from '../config/contact';
 
 /**
  * Full disclaimer / attribution page.
@@ -86,17 +85,6 @@ export default function AboutPage({ onBack }: Props) {
               <p className="mb-4">{t('aboutSection6Body')}</p>
 
               <ContactForm />
-
-              <p className="mt-6 mb-2 text-xs text-gray-500">{t('aboutSection6GithubAlt')}</p>
-              <a
-                href={GITHUB_REPO_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 transition"
-              >
-                <span aria-hidden>🐙</span>
-                {t('aboutSection6GithubLabel')} ↗
-              </a>
             </Section>
           </div>
 

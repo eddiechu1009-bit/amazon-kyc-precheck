@@ -184,9 +184,6 @@ export default function ContactForm() {
           className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-amazon-orange focus:ring-2 focus:ring-amazon-orange/20 focus:outline-none transition"
           autoComplete="email"
         />
-        <p className="text-[11px] text-gray-400 mt-1 leading-relaxed">
-          {t('contactFormReplyEmailHint')}
-        </p>
       </div>
 
       {/* Honeypot — hidden from real users, bots fill it */}
@@ -223,10 +220,6 @@ export default function ContactForm() {
       >
         {status === 'sending' ? t('contactFormSending') : t('contactFormSubmit')}
       </button>
-
-      <p className="text-[11px] text-gray-400 leading-relaxed text-center">
-        {t('contactFormPrivacyNote')}
-      </p>
     </form>
   );
 }

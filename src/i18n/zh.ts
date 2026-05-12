@@ -213,7 +213,6 @@ export const zh = {
   disclaimerBullet2: '所有分析結果僅供參考。最終 KYC 審核結果以 Amazon 當下判定為準,本工具不保證能讓你通過審核。',
   disclaimerBullet3: '你填的資料與上傳的檔案全程在你的瀏覽器中處理,不會上傳到任何伺服器。關閉頁面即清除。',
   disclaimerAcknowledge: '我已閱讀並了解以上說明',
-  disclaimerReadFull: '閱讀完整聲明',
   disclaimerOk: '開始使用',
 
   // About / Full disclaimer page
@@ -245,9 +244,7 @@ export const zh = {
   aboutSection5Bullet3: '如果你發現工具的判讀與 Amazon 實際要求有落差,請以 Amazon 最新公告為準。',
   aboutSection5Bullet4: '本工具可能因為 Amazon 政策調整而出現過時資訊,我們會盡力維護,但不保證即時更新。',
   aboutSection6Title: '六、回報問題 / 聯絡方式',
-  aboutSection6Body: '發現 bug、規則錯誤,或有使用上的疑問?請填下方表單,我會直接收到訊息。你的訊息會透過表單轉送服務傳送,我的信箱不會出現在網頁原始碼中。',
-  aboutSection6GithubAlt: '若你有 GitHub 帳號,也可直接到專案頁開 issue:',
-  aboutSection6GithubLabel: 'GitHub 專案頁',
+  aboutSection6Body: '發現 bug、規則錯誤,或有使用上的疑問?請填下方表單,我會直接收到訊息。',
 
   // Contact form
   contactFormDisabled: '表單尚未設定,暫時只能透過 GitHub Issues 聯絡。',
@@ -260,14 +257,12 @@ export const zh = {
   contactFormMessagePlaceholder: '請描述你遇到的狀況、錯誤訊息,或建議的改善方向…',
   contactFormTooShort: '請輸入至少 {n} 個字元',
   contactFormReplyEmail: '回信 Email',
-  contactFormReplyEmailHint: '留下 email 我才能回覆你;留空我就只能單方面收到你的訊息。',
+  contactFormErrorTitle: '送出失敗',
   contactFormSubmit: '送出回報',
   contactFormSending: '送出中…',
-  contactFormErrorTitle: '送出失敗',
   contactFormSentTitle: '已送出,感謝你的回報',
   contactFormSentDesc: '我會盡快看到訊息。如果你留了回信 email,會在需要時與你聯繫。',
   contactFormSendAnother: '再寄一則 →',
-  contactFormPrivacyNote: '這份表單只會把你填的內容轉寄給專案維護者,不會被分析、分享或儲存在第三方分析服務。',
 
   // Footer (new)
   footerDisclaimerShort: '本工具為獨立開源專案,與 Amazon 無隸屬關係。所有分析僅供參考,最終以 Amazon 審核為準。',

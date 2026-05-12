@@ -18,9 +18,6 @@
  */
 export const FORMSPREE_ENDPOINT = 'https://formspree.io/f/xqennqpr';
 
-/** Public GitHub repo URL used as a secondary contact channel. */
-export const GITHUB_REPO_URL = 'https://github.com/eddiechu1009-bit/amazon-kyc-precheck';
-
 export function isContactFormEnabled(): boolean {
   return FORMSPREE_ENDPOINT.startsWith('https://formspree.io/f/');
 }

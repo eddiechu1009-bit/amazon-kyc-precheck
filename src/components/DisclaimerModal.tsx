@@ -42,11 +42,9 @@ function ackDisclaimer(): void {
 interface Props {
   /** Called when the user clicks OK. Parent should dismiss the modal. */
   onAcknowledge: () => void;
-  /** Called when the user clicks "read full disclaimer" link. */
-  onOpenAboutPage: () => void;
 }
 
-export default function DisclaimerModal({ onAcknowledge, onOpenAboutPage }: Props) {
+export default function DisclaimerModal({ onAcknowledge }: Props) {
   const { t } = useT();
   const [checked, setChecked] = useState(false);
 
@@ -94,14 +92,6 @@ export default function DisclaimerModal({ onAcknowledge, onOpenAboutPage }: Prop
           <DisclaimerBullet icon="🏷️" text={t('disclaimerBullet1')} />
           <DisclaimerBullet icon="⚖️" text={t('disclaimerBullet2')} />
           <DisclaimerBullet icon="🔒" text={t('disclaimerBullet3')} />
-
-          <button
-            type="button"
-            onClick={onOpenAboutPage}
-            className="text-xs text-amazon-orange hover:text-amazon-orange-hover hover:underline font-medium transition"
-          >
-            {t('disclaimerReadFull')} →
-          </button>
         </div>
 
         <div className="px-5 sm:px-7 pb-6 border-t border-gray-100 pt-4 space-y-3">

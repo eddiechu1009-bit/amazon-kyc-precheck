@@ -216,7 +216,6 @@ export const en: typeof zh = {
   disclaimerBullet2: 'All analysis is for reference only. Amazon has the final say on KYC results. This tool does not guarantee that you will pass their review.',
   disclaimerBullet3: "Everything you type and every file you upload stays inside your browser. Nothing is sent to a server. Close the page and it is all gone.",
   disclaimerAcknowledge: 'I have read and understand the notes above',
-  disclaimerReadFull: 'Read the full disclaimer',
   disclaimerOk: 'Continue',
 
   // About / Full disclaimer page
@@ -248,9 +247,7 @@ export const en: typeof zh = {
   aboutSection5Bullet3: "If the tool's guidance differs from Amazon's actual requirement, always defer to Amazon's most recent official communication.",
   aboutSection5Bullet4: 'Rules may become outdated when Amazon updates its policy. We maintain the tool best-effort but do not guarantee real-time accuracy.',
   aboutSection6Title: '6. Reporting issues & contact',
-  aboutSection6Body: "Found a bug or incorrect rule? Have a usage question? Please use the form below — I'll receive your message directly. Your note is sent via a form-forwarding service; my email address is not exposed in the page source.",
-  aboutSection6GithubAlt: 'If you have a GitHub account, you can also open an issue on the project page:',
-  aboutSection6GithubLabel: 'GitHub project page',
+  aboutSection6Body: "Found a bug or incorrect rule? Have a usage question? Please use the form below — I'll receive your message directly.",
 
   // Contact form
   contactFormDisabled: 'Contact form is not configured yet — please use GitHub Issues for now.',
@@ -263,14 +260,12 @@ export const en: typeof zh = {
   contactFormMessagePlaceholder: 'Describe what you ran into, any error messages, or the improvement you have in mind…',
   contactFormTooShort: 'Please enter at least {n} characters',
   contactFormReplyEmail: 'Reply email',
-  contactFormReplyEmailHint: "Leave an email if you want a reply. If you leave it blank I'll just receive your note one-way.",
   contactFormSubmit: 'Send feedback',
   contactFormSending: 'Sending…',
   contactFormErrorTitle: 'Send failed.',
   contactFormSentTitle: 'Sent — thank you!',
   contactFormSentDesc: "I'll read your note as soon as I can. If you left a reply email, I'll get back to you when relevant.",
   contactFormSendAnother: 'Send another →',
-  contactFormPrivacyNote: "This form forwards your message to the project maintainer only. It isn't analyzed, shared, or stored with third-party analytics.",
 
   // Footer (new)
   footerDisclaimerShort: 'Independent open-source project. Not affiliated with Amazon. Analysis is for reference only — Amazon has the final say.',

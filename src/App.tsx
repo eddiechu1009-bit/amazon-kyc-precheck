@@ -47,15 +47,9 @@ export default function App() {
   if (!started) {
     return (
       <>
-        <Landing onStart={() => setStarted(true)} onOpenAbout={() => navigateTo('about')} />
+        <Landing onStart={() => setStarted(true)} />
         {showDisclaimer && (
-          <DisclaimerModal
-            onAcknowledge={() => setShowDisclaimer(false)}
-            onOpenAboutPage={() => {
-              setShowDisclaimer(false);
-              navigateTo('about');
-            }}
-          />
+          <DisclaimerModal onAcknowledge={() => setShowDisclaimer(false)} />
         )}
       </>
     );
@@ -64,13 +58,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {showDisclaimer && (
-        <DisclaimerModal
-          onAcknowledge={() => setShowDisclaimer(false)}
-          onOpenAboutPage={() => {
-            setShowDisclaimer(false);
-            navigateTo('about');
-          }}
-        />
+        <DisclaimerModal onAcknowledge={() => setShowDisclaimer(false)} />
       )}
       <header className="bg-shimmer text-white px-4 py-3 flex items-center justify-between sticky top-0 z-50 shadow-lg">
         <div className="flex items-center gap-3 min-w-0">
@@ -131,7 +119,7 @@ export default function App() {
   );
 }
 
-function Landing({ onStart, onOpenAbout }: { onStart: () => void; onOpenAbout: () => void }) {
+function Landing({ onStart }: { onStart: () => void }) {
   const { t } = useT();
   return (
     <div className="min-h-screen bg-shimmer px-4 py-6 sm:py-10 flex items-center">
@@ -204,24 +192,8 @@ function Landing({ onStart, onOpenAbout }: { onStart: () => void; onOpenAbout: (
                   →
                 </span>
               </button>
-              <p className="text-[11px] text-gray-400 mt-4">
-                {t('footerPrivacy')}
-              </p>
             </div>
           </div>
-        </div>
-
-        {/* Trust microcopy */}
-        <p className="text-center text-[11px] text-white/60 mt-5 leading-relaxed max-w-xl mx-auto">
-          {t('sourcesDisclaimer')}
-        </p>
-        <div className="text-center mt-2">
-          <button
-            onClick={onOpenAbout}
-            className="text-[11px] text-white/70 hover:text-white underline-offset-2 hover:underline transition"
-          >
-            {t('footerReadFull')}
-          </button>
         </div>
       </div>
     </div>
@@ -307,18 +279,16 @@ function Footer({ onOpenAbout }: { onOpenAbout: () => void }) {
   const { t } = useT();
   return (
     <footer className="text-center text-[11px] sm:text-xs text-gray-500 py-6 px-4 border-t mt-auto">
-      <div className="max-w-2xl mx-auto bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 mb-4">
-        <p className="leading-relaxed text-gray-600">{t('footerDisclaimerShort')}</p>
+      <p className="max-w-2xl mx-auto leading-relaxed">
+        {t('footerDisclaimerShort')}{' '}
         <button
           onClick={onOpenAbout}
-          className="mt-1.5 text-[11px] text-amazon-orange hover:text-amazon-orange-hover font-medium hover:underline transition"
+          className="text-amazon-orange hover:text-amazon-orange-hover font-medium hover:underline transition"
         >
           {t('footerReadFull')}
         </button>
-      </div>
-      <p className="max-w-2xl mx-auto leading-relaxed">{t('footerDataSource')}</p>
-      <p className="max-w-2xl mx-auto leading-relaxed mt-1">{t('footerPrivacy')}</p>
-      <div className="mt-3 text-gray-400 text-[10px] uppercase tracking-wider font-semibold">
+      </p>
+      <div className="mt-4 text-gray-400 text-[10px] uppercase tracking-wider font-semibold">
         {t('footerRelated')}
       </div>
       <div className="mt-2 flex flex-wrap justify-center gap-2">
