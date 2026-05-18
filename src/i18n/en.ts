@@ -188,9 +188,11 @@ export const en: typeof zh = {
   footerDataSource: 'Sources: Amazon Seller Central public guidance + common EU KYC internal rejection patterns. For reference only — final decision rests with Amazon.',
   footerPrivacy: 'Privacy: This tool stores nothing. All processing happens in your browser.',
   footerRelated: 'Related tools',
-  footerToolSellerKit: '🇪🇺 EU Seller Toolkit',
+  footerToolNewSellerPrep: '🇪🇺 New Seller Prep',
+  footerToolSellerKit: '🛠️ Seller Toolkit',
   footerToolCaseWriter: '📝 Case Writer',
   footerToolAccounting: '📊 Accounting Analyzer',
+  footerToolTutorials: '📖 Tutorials',
 
   // Sources
   sourcesTitle: 'Sources & basis',

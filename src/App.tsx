@@ -298,6 +298,14 @@ function Footer({ onOpenAbout }: { onOpenAbout: () => void }) {
           rel="noopener noreferrer"
           className="px-3 py-1 bg-gray-50 hover:bg-amazon-orange/10 hover:text-amazon-dark border border-gray-200 hover:border-amazon-orange/30 rounded-full transition"
         >
+          {t('footerToolNewSellerPrep')}
+        </a>
+        <a
+          href="https://eu-seller-toolkit.netlify.app/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="px-3 py-1 bg-gray-50 hover:bg-amazon-orange/10 hover:text-amazon-dark border border-gray-200 hover:border-amazon-orange/30 rounded-full transition"
+        >
           {t('footerToolSellerKit')}
         </a>
         <a
@@ -315,6 +323,14 @@ function Footer({ onOpenAbout }: { onOpenAbout: () => void }) {
           className="px-3 py-1 bg-gray-50 hover:bg-amazon-orange/10 hover:text-amazon-dark border border-gray-200 hover:border-amazon-orange/30 rounded-full transition"
         >
           {t('footerToolAccounting')}
+        </a>
+        <a
+          href="https://eu-seller-101.netlify.app/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="px-3 py-1 bg-amazon-orange/10 text-amazon-dark hover:bg-amazon-orange hover:text-white border border-amazon-orange/30 hover:border-amazon-orange rounded-full transition font-medium"
+        >
+          {t('footerToolTutorials')}
         </a>
       </div>
     </footer>

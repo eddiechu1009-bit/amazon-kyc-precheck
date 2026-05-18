@@ -185,9 +185,11 @@ export const zh = {
   footerDataSource: '資料來源：Amazon Seller Central 公開指引、EU KYC 內部常見退件模式整理。內容僅供參考，最終以 Amazon 審核為準。',
   footerPrivacy: '隱私：本工具不儲存任何資料，所有處理在你的瀏覽器端完成。',
   footerRelated: '相關工具',
-  footerToolSellerKit: '🇪🇺 歐洲賣家工具箱',
+  footerToolNewSellerPrep: '🇪🇺 新賣家準備工具',
+  footerToolSellerKit: '🛠️ 營運工具箱',
   footerToolCaseWriter: '📝 Case 撰寫工具',
   footerToolAccounting: '📊 帳務分析工具',
+  footerToolTutorials: '📖 使用教材',
 
   // Sources
   sourcesTitle: '資料來源與依據',
