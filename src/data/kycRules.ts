@@ -54,6 +54,19 @@ const PUB_EXPERIENCE_NAME_CONSISTENCY: Source = {
   },
 };
 
+const PUB_PRIMARY_ADDRESS_2026: Source = {
+  type: 'experience',
+  label: {
+    zh: '主要營業地址驗證新規（2026 年起）',
+    en: 'Primary business address verification (from 2026)',
+  },
+  retrievedAt: '2026-08-06',
+  note: {
+    zh: '2026 年起賣家陸續收到「主要營業地址」確認與核驗通知，驗證方式為實體明信片驗證碼或近 90 天地址證明文件。此項依多份業界報導歸納，Amazon 未見統一的公開公告頁；實際要求請以後台通知為準。',
+    en: 'From 2026, sellers have been receiving requests to confirm and verify their primary business address, verified by a mailed postcard code or by address documents from the last 90 days. Summarized from multiple industry reports; no single official Amazon announcement page was located. Follow the notice in your account.',
+  },
+};
+
 const PUB_EXPERIENCE_INFO_CHANGE: Source = {
   type: 'experience',
   label: {
@@ -265,6 +278,61 @@ const PROOF_OF_ADDRESS: ChecklistItem = {
   category: 'address',
   sources: [PUB_SELLER_CENTRAL_KYC, PUB_EXPERIENCE_90_DAYS],
   internalRefs: [INT_KYC_COMPLIANCE_GUIDE],
+};
+
+const PRIMARY_BUSINESS_ADDRESS: ChecklistItem = {
+  id: 'primary_business_address',
+  title: {
+    zh: '主要營業地址驗證（2026 年新增）',
+    en: 'Primary business address verification (new in 2026)',
+  },
+  why: {
+    zh: '「主要營業地址」是你實際日常辦公的地點，與工商登記的「註冊地址」是兩個不同欄位，可以相同也可以不同。Amazon 用它對應 DAC7 與 VAT 的稅務判定，因此要求可獨立核驗。台灣／中國賣家填自己實際的辦公地址即可，不需要也不應該填一個歐洲地址。',
+    en: 'The primary business address is where you actually conduct daily operations — a separate field from your registered address, and they may differ. Amazon uses it for DAC7 and VAT determination, so it must be independently verifiable. Sellers operating from Taiwan or China should enter their real local office address, not a European one.',
+  },
+  prepTips: [
+    {
+      zh: '地址必須能實際收到郵件 —— 其中一種核驗方式是 Amazon 寄一張含驗證碼的明信片，你收到後回填。',
+      en: 'The address must be able to receive mail — one verification route is a postcard with a code that you enter back in Seller Central.',
+    },
+    {
+      zh: '另一種方式是上傳近 90 天內的地址證明（水電網帳單、銀行對公帳單或場地租賃合約），需清楚顯示公司全名與完整地址。',
+      en: 'The alternative is uploading address evidence from the last 90 days (utility bill, business bank statement, or lease), clearly showing the full company name and complete address.',
+    },
+    {
+      zh: '街道、門牌、樓層、室號、郵遞區號要完整，用英文或拼音一致表述；縮寫或漏層級容易驗證失敗。',
+      en: 'Include street, number, floor, unit and postcode in full, using one consistent romanization. Abbreviations or missing levels often fail verification.',
+    },
+    {
+      zh: '填寫前先讓後台的主要營業地址、VAT 登記地址、銀行收款地址三者一致，可減少被追問的機會。',
+      en: 'Align the primary business address with your VAT registration and bank account address before submitting to reduce follow-up requests.',
+    },
+    {
+      zh: '⚠️ 修改後台地址本身就可能觸發 KYC 重審，所以改之前先把對應的地址證明文件準備好。',
+      en: '⚠️ Editing the address can itself trigger a KYC re-review, so have the matching address evidence ready before you change it.',
+    },
+  ],
+  commonRejection: [
+    {
+      zh: '填的是秘書公司／虛擬辦公室／掛靠地址 —— 這類地址不能作為主要營業地址。',
+      en: 'Using a company-secretary, virtual-office or nominee address — these are not acceptable as a primary business address.',
+    },
+    {
+      zh: '公司註冊在境外（例如英國）就跟著填歐洲地址，但實際辦公在亞洲 —— 應填實際辦公地。',
+      en: 'Entering a European address because the company is registered there, while operations are actually in Asia — enter the real operating address.',
+    },
+    {
+      zh: '地址無法收件，導致明信片驗證失敗。',
+      en: 'Address cannot receive mail, so postcard verification fails.',
+    },
+    {
+      zh: '證明文件上的公司名稱或地址與後台填寫不一致。',
+      en: 'Company name or address on the evidence does not match what was entered in Seller Central.',
+    },
+  ],
+  priority: 'required',
+  category: 'address',
+  sources: [PUB_SELLER_CENTRAL_KYC, PUB_PRIMARY_ADDRESS_2026],
 };
 
 const BANK_STATEMENT: ChecklistItem = {
@@ -484,14 +552,15 @@ const INDIVIDUAL_PROOF: ChecklistItem = {
 
 export const rules: Rule[] = [
   {
+    // PRIMARY_BUSINESS_ADDRESS 只給公司型主體：個人賣家沒有「營業地址」這個欄位
     id: 'limited_company_base',
     when: (a) => a.entity === 'limited',
-    items: [COMPANY_REGISTRATION, BO_ID, PROOF_OF_ADDRESS, BANK_STATEMENT, CREDIT_CARD],
+    items: [COMPANY_REGISTRATION, BO_ID, PROOF_OF_ADDRESS, PRIMARY_BUSINESS_ADDRESS, BANK_STATEMENT, CREDIT_CARD],
   },
   {
     id: 'sole_prop_base',
     when: (a) => a.entity === 'sole_prop',
-    items: [BUSINESS_LICENSE, BO_ID, PROOF_OF_ADDRESS, BANK_STATEMENT, CREDIT_CARD],
+    items: [BUSINESS_LICENSE, BO_ID, PROOF_OF_ADDRESS, PRIMARY_BUSINESS_ADDRESS, BANK_STATEMENT, CREDIT_CARD],
   },
   {
     id: 'individual_base',

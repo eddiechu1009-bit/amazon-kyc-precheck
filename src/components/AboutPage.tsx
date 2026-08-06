@@ -8,7 +8,9 @@ import ContactForm from './ContactForm';
  * in the first-time modal and footer.
  */
 
-const LAST_UPDATED = '2026-05-12';
+// 工具本身的最後更新日。KYC 規則各自的 retrievedAt（見 kycRules.ts）是「該條規則
+// 最後查證日」，兩者不同步是正常的 —— 規則沒重查就不該改那邊的日期。
+const LAST_UPDATED = '2026-08-06';
 
 interface Props {
   onBack: () => void;

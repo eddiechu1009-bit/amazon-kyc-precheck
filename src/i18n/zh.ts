@@ -12,7 +12,7 @@ export const zh = {
   // Home
   homeTitleLead: 'KYC 被退件',
   homeTitleMain: '有 80% 是因為這幾個小地方',
-  homeLead: '我們把 Amazon EU KYC 內部常見退件原因整理成自助檢查。按部就班走完，大幅提高一次通過的機率。',
+  homeLead: '我們把 Amazon EU KYC 常見的退件原因整理成自助檢查。按部就班走完，大幅提高一次通過的機率。',
   homeCtaStart: '開始自助檢查 →',
   homeStep1Title: '回答幾個問題',
   homeStep1Desc: '公司型態、受益人、銀行所在地，3 分鐘內完成',
@@ -31,7 +31,7 @@ export const zh = {
 
   // Wizard — Intro
   wizardIntroTitle: '回答幾個問題，我們幫你列出該準備的文件',
-  wizardIntroDesc: '這些問題對應 Amazon EU KYC 內部審核時會比對的欄位。越貼近真實狀況，報告越準確。',
+  wizardIntroDesc: '這些問題對應 Amazon EU KYC 審核時會比對的欄位。越貼近真實狀況，報告越準確。',
 
   // Wizard — questions
   qEntityTypeTitle: '你的經營主體屬於哪一種？',
@@ -182,7 +182,7 @@ export const zh = {
   afterRejectComingDesc: '貼上 Amazon 給你的退件通知，我們會解析原因、對應下一步動作、產生中英補件信草稿。',
 
   // Footer
-  footerDataSource: '資料來源：Amazon Seller Central 公開指引、EU KYC 內部常見退件模式整理。內容僅供參考，最終以 Amazon 審核為準。',
+  footerDataSource: '資料來源：Amazon Seller Central 公開指引，以及公開案例中常見的 EU KYC 退件模式整理。內容僅供參考，最終以 Amazon 審核為準。',
   footerPrivacy: '隱私：本工具不儲存任何資料，所有處理在你的瀏覽器端完成。',
   footerRelated: '相關工具',
   footerToolNewSellerPrep: '🇪🇺 新賣家準備工具',

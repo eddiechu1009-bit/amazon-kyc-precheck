@@ -34,7 +34,7 @@ export const en: typeof zh = {
 
   // Wizard — Intro
   wizardIntroTitle: 'Answer a few questions and get your personalized document list',
-  wizardIntroDesc: 'These questions map directly to what Amazon EU KYC verifies internally. The more accurate your answers, the more accurate the report.',
+  wizardIntroDesc: 'These questions map to the fields Amazon EU KYC checks during review. The more accurate your answers, the more accurate the report.',
 
   // Wizard — questions
   qEntityTypeTitle: 'What kind of legal entity do you operate?',
@@ -185,7 +185,7 @@ export const en: typeof zh = {
   afterRejectComingDesc: 'Paste the rejection notice from Amazon. We will parse the reason, point you to the next action, and draft a bilingual response.',
 
   // Footer
-  footerDataSource: 'Sources: Amazon Seller Central public guidance + common EU KYC internal rejection patterns. For reference only — final decision rests with Amazon.',
+  footerDataSource: 'Sources: Amazon Seller Central public guidance, plus commonly reported EU KYC rejection patterns. For reference only — final decision rests with Amazon.',
   footerPrivacy: 'Privacy: This tool stores nothing. All processing happens in your browser.',
   footerRelated: 'Related tools',
   footerToolNewSellerPrep: '🇪🇺 New Seller Prep',
