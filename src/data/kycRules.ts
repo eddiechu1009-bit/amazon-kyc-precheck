@@ -13,8 +13,25 @@ const PUB_SELLER_CENTRAL_KYC: Source = {
   url: 'https://sellercentral.amazon.co.uk/help/hub/reference/external/200405020',
   retrievedAt: '2026-05-07',
   note: {
-    zh: 'Amazon EU 官方 Help page，列出 KYC 要求的文件類型。實際欄位會隨帳號狀況變動。',
-    en: 'Official Amazon EU Help page listing the document types required for KYC. Actual fields may vary by account status.',
+    zh: 'Amazon EU 官方 Help page，列出 KYC 要求的文件類型。實際欄位會隨帳號狀況變動。註：2026-08-11 重新查核時該頁需登入才能讀取，故 retrievedAt 保留 2026-05-07（最後實際讀到內容的日期），未逕行更新。',
+    en: 'Official Amazon EU Help page listing the document types required for KYC. Actual fields may vary by account status. Note: on a 2026-08-11 re-check the page required sign-in, so retrievedAt stays at 2026-05-07 (the last date the content was actually read) rather than being bumped.',
+  },
+};
+
+// 2026-08-11 重新查核：官方 Help page 需登入，改以公開來源交叉比對。
+// 台灣主體適用的要求未見變動（設立登記表／負責人身分證／地址證明／銀行證明）。
+// 中國大陸主體另有升級（戶口本本人頁＋稅務局蓋章之近 12 個月納稅證明），
+// 對台灣賣家不適用，故不寫入 checklist，只在此註記避免日後誤植。
+const PUB_KYC_RECHECK_2026_08: Source = {
+  type: 'experience',
+  label: {
+    zh: 'KYC 要求重新查核（2026-08）',
+    en: 'KYC requirements re-check (2026-08)',
+  },
+  retrievedAt: '2026-08-11',
+  note: {
+    zh: '以公開來源交叉比對後，台灣主體的 KYC 文件要求與 2026-05 相同，未發現新增項目。期間唯一新增的是「主要營業地址」驗證（見該項）。另中國大陸主體自 2026 年起加驗戶口本與納稅證明，台灣賣家不適用。審核時效仍為初審約 1-3 個工作日、完整流程約 10 個工作日。',
+    en: 'Cross-checking public sources found no change to the KYC document set for Taiwan-registered entities since 2026-05. The only addition in that period is primary business address verification (see that item). Mainland China entities additionally face household-register and tax-certificate checks, which do not apply to Taiwan sellers. Review time remains roughly 1-3 business days for the first pass and up to about 10 business days end to end.',
   },
 };
 
@@ -160,7 +177,7 @@ const COMPANY_REGISTRATION: ChecklistItem = {
   ],
   priority: 'required',
   category: 'entity',
-  sources: [PUB_SELLER_CENTRAL_KYC, PUB_EXPERIENCE_NAME_CONSISTENCY],
+  sources: [PUB_SELLER_CENTRAL_KYC, PUB_EXPERIENCE_NAME_CONSISTENCY, PUB_KYC_RECHECK_2026_08],
   internalRefs: [INT_KYC_COMPLIANCE_GUIDE, INT_KYC_ESC_WIKI],
 };
 
@@ -192,7 +209,7 @@ const BUSINESS_LICENSE: ChecklistItem = {
   ],
   priority: 'required',
   category: 'entity',
-  sources: [PUB_EXPERIENCE_RECENT_CASES, PUB_EXPERIENCE_90_DAYS],
+  sources: [PUB_EXPERIENCE_RECENT_CASES, PUB_EXPERIENCE_90_DAYS, PUB_KYC_RECHECK_2026_08],
   internalRefs: [INT_KYC_COMPLIANCE_GUIDE],
 };
 
