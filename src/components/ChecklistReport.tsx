@@ -120,7 +120,7 @@ export default function ChecklistReport({ items, answers, onEdit }: Props) {
             <span className="text-sm font-mono text-gray-600 tabular-nums">
               {doneCount} / {items.length}
             </span>
-            {doneCount > 0 && (
+            {checked.size > 0 && (
               <button
                 type="button"
                 onClick={() => { if (confirm(t('reportResetConfirm'))) setChecked(new Set()); }}

@@ -59,8 +59,7 @@ export default function ContactForm() {
         category,
         message: message.trim(),
         replyEmail: replyEmail.trim() || '(not provided)',
-        // 只送使用者自己填的欄位；不附瀏覽器資訊、語言、時間，也不附任何 KYC 文件或自檢結果
-        _subject: `[Pass KYC] ${categoryLabel(category, t)}`,
+        // 只送使用者自己填的欄位；不附瀏覽器資訊、語言、時間、自動主旨，也不附任何 KYC 文件或自檢結果
       };
 
       const res = await fetch(FORMSPREE_ENDPOINT, {
