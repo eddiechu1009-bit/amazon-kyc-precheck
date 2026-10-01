@@ -4,7 +4,7 @@ export const zh = {
   appTagline: 'Amazon 歐洲站 KYC 提交前自助檢查',
   appSubtitle: '在送出前先確認，不再被系統退件。所有資料只留在你的瀏覽器。',
   privacyBadge: '🔒 純瀏覽器運算｜文件不上傳',
-  privacyDetail: '你輸入的所有資訊與上傳的檔案完全在你的瀏覽器中處理，不會傳送到任何伺服器。關閉頁面即全部消失。',
+  privacyDetail: '你輸入的所有資訊與上傳的檔案完全在你的瀏覽器中處理，不會傳送到任何伺服器（只有你在「意見回報」表單主動送出的內容例外）。',
   langLabel: '語言',
   resetAll: '重新開始',
   resetConfirm: '確定要清除所有作答與上傳嗎？',
@@ -213,7 +213,7 @@ export const zh = {
   disclaimerModalIntro: '這是我為 Amazon EU 賣家做的獨立工具,正式使用前請留意三件事:',
   disclaimerBullet1: '本工具為獨立開源專案,與 Amazon 無隸屬、代理或授權關係。所有 Amazon 商標屬於 Amazon.com, Inc.',
   disclaimerBullet2: '所有分析結果僅供參考。最終 KYC 審核結果以 Amazon 當下判定為準,本工具不保證能讓你通過審核。',
-  disclaimerBullet3: '你填的資料與上傳的檔案全程在你的瀏覽器中處理,不會上傳到任何伺服器。關閉頁面即清除。',
+  disclaimerBullet3: '你填的資料與上傳的檔案全程在你的瀏覽器中處理,不會上傳到任何伺服器。只有你在「意見回報」表單主動送出的訊息與選填 Email 會寄給工具作者。',
   disclaimerAcknowledge: '我已閱讀並了解以上說明',
   disclaimerOk: '開始使用',
 
@@ -233,7 +233,7 @@ export const zh = {
   aboutSection3Bullet1: '你填的每一個答案、上傳的每一份文件,都只在你自己的瀏覽器記憶體中處理。',
   aboutSection3Bullet2: '檔案不會被上傳到任何伺服器。OCR 辨識透過 Tesseract.js 在你的裝置上執行。',
   aboutSection3Bullet3: '我們不使用 cookie,不做使用者分析(no Google Analytics / no tracking)。',
-  aboutSection3Bullet4: '本工具只會使用 localStorage 儲存你的語言偏好、自訂退件規則與本聲明閱讀紀錄。這些資料只留在你自己的裝置。',
+  aboutSection3Bullet4: '本工具只會使用 localStorage 儲存你的語言偏好、自訂退件規則、文件清單的勾選進度與本聲明閱讀紀錄。這些資料只留在你自己的裝置；勾選進度可在清單頁按「重新開始」清除，全部資料可用瀏覽器的「清除網站資料」移除。',
   aboutSection3Bullet5: '關閉瀏覽器分頁後,分析過程中產生的所有中間資料立即消失。',
   aboutSection4Title: '四、資料來源與歸屬',
   aboutSection4Body: '本工具整合的 KYC 規則來自兩大類資料:',
@@ -265,6 +265,9 @@ export const zh = {
   contactFormSentTitle: '已送出,感謝你的回報',
   contactFormSentDesc: '我會盡快看到訊息。如果你留了回信 email,會在需要時與你聯繫。',
   contactFormSendAnother: '再寄一則 →',
+  contactFormPrivacyNote: '送出後，你填的訊息與選填的回信 Email 會透過 Formspree（第三方表單服務）寄給工具作者。請不要貼上 KYC 文件內容、證件號碼或銀行資料。',
+  reportReset: '重新開始',
+  reportResetConfirm: '要清除這份清單的所有勾選嗎？',
 
   // Footer (new)
   footerDisclaimerShort: '本工具為獨立開源專案,與 Amazon 無隸屬關係。所有分析僅供參考,最終以 Amazon 審核為準。',

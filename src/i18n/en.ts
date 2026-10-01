@@ -7,7 +7,7 @@ export const en: typeof zh = {
   appTagline: 'Amazon EU Seller KYC Pre-Submission Self-Check',
   appSubtitle: 'Check before you submit, not after you get rejected. Everything runs in your browser.',
   privacyBadge: '🔒 100% in-browser · No file upload',
-  privacyDetail: 'Every answer and file you provide stays inside your browser. Nothing is sent to any server. Close the page and it is all gone.',
+  privacyDetail: 'Every answer and file you provide stays inside your browser. Nothing is sent to any server (except what you choose to send through the feedback form).',
   langLabel: 'Language',
   resetAll: 'Start over',
   resetConfirm: 'Clear all answers and uploads?',
@@ -216,7 +216,7 @@ export const en: typeof zh = {
   disclaimerModalIntro: "This is an independent tool for Amazon EU sellers. A few things to know first:",
   disclaimerBullet1: 'This is an independent open-source project. It is NOT affiliated with, endorsed by, or sponsored by Amazon.com, Inc. All Amazon trademarks belong to Amazon.com, Inc.',
   disclaimerBullet2: 'All analysis is for reference only. Amazon has the final say on KYC results. This tool does not guarantee that you will pass their review.',
-  disclaimerBullet3: "Everything you type and every file you upload stays inside your browser. Nothing is sent to a server. Close the page and it is all gone.",
+  disclaimerBullet3: "Everything you type and every file you upload stays inside your browser. Nothing is sent to a server. Only the message and optional email you submit through the feedback form are sent to the tool's author.",
   disclaimerAcknowledge: 'I have read and understand the notes above',
   disclaimerOk: 'Continue',
 
@@ -236,7 +236,7 @@ export const en: typeof zh = {
   aboutSection3Bullet1: 'Every answer you type and every file you upload is processed only in your own browser memory.',
   aboutSection3Bullet2: 'Files are never uploaded to any server. OCR is performed locally on your device via Tesseract.js.',
   aboutSection3Bullet3: 'No cookies, no user analytics (no Google Analytics, no tracking pixels).',
-  aboutSection3Bullet4: 'We only use localStorage to remember your language preference, your custom rejection rules, and the fact that you have read this disclaimer. All of that stays on your device.',
+  aboutSection3Bullet4: 'We only use localStorage to remember your language preference, your custom rejection rules, your checklist progress, and the fact that you have read this disclaimer. All of that stays on your device. Clear checklist progress with "Start over" on the checklist page, or remove everything by clearing this site’s data in your browser.',
   aboutSection3Bullet5: 'Close the tab and every piece of intermediate data is gone.',
   aboutSection4Title: '4. Sources & attribution',
   aboutSection4Body: 'KYC rules inside this tool come from two kinds of sources:',
@@ -268,6 +268,9 @@ export const en: typeof zh = {
   contactFormSentTitle: 'Sent — thank you!',
   contactFormSentDesc: "I'll read your note as soon as I can. If you left a reply email, I'll get back to you when relevant.",
   contactFormSendAnother: 'Send another →',
+  contactFormPrivacyNote: 'When you submit, your message and optional reply email are sent to the tool’s author via Formspree (a third-party form service). Please do not paste KYC documents, ID numbers or bank details.',
+  reportReset: 'Start over',
+  reportResetConfirm: 'Clear all ticks on this checklist?',
 
   // Footer (new)
   footerDisclaimerShort: 'Independent open-source project. Not affiliated with Amazon. Analysis is for reference only — Amazon has the final say.',

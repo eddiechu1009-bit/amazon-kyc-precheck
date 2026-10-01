@@ -59,11 +59,8 @@ export default function ContactForm() {
         category,
         message: message.trim(),
         replyEmail: replyEmail.trim() || '(not provided)',
-        lang,
-        userAgent: navigator.userAgent,
-        submittedAt: new Date().toISOString(),
-        // Formspree picks this up as the subject line in the forwarded email
-        _subject: `[Pass KYC] ${categoryLabel(category, t)} — ${new Date().toISOString().slice(0, 10)}`,
+        // 只送使用者自己填的欄位；不附瀏覽器資訊、語言、時間，也不附任何 KYC 文件或自檢結果
+        _subject: `[Pass KYC] ${categoryLabel(category, t)}`,
       };
 
       const res = await fetch(FORMSPREE_ENDPOINT, {
@@ -208,6 +205,8 @@ export default function ContactForm() {
           <strong>{t('contactFormErrorTitle')}</strong> {errorMsg || ''}
         </div>
       )}
+
+      <p className="text-[11px] text-gray-500 leading-relaxed">{t('contactFormPrivacyNote')}</p>
 
       <button
         type="submit"

@@ -9,6 +9,7 @@ import {
 } from '../data/rejectionPatterns';
 import { getBaseTemplate } from '../data/replyTemplates';
 import {
+  clearAllOverrides,
   clearOverride,
   exportOverridesJson,
   importOverridesJson,
@@ -307,7 +308,7 @@ export function CustomRulesToolbar({ onChanged }: { onChanged: () => void }) {
 
   const onClearAll = () => {
     if (!confirm(t('editorResetConfirm'))) return;
-    localStorage.removeItem('pass-kyc-custom-rules-v1');
+    clearAllOverrides();
     onChanged();
     flash(t('editorReset'));
   };

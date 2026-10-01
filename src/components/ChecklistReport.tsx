@@ -120,6 +120,15 @@ export default function ChecklistReport({ items, answers, onEdit }: Props) {
             <span className="text-sm font-mono text-gray-600 tabular-nums">
               {doneCount} / {items.length}
             </span>
+            {doneCount > 0 && (
+              <button
+                type="button"
+                onClick={() => { if (confirm(t('reportResetConfirm'))) setChecked(new Set()); }}
+                className="text-xs text-gray-500 hover:text-amazon-dark hover:underline"
+              >
+                {t('reportReset')}
+              </button>
+            )}
           </div>
         </div>
 
