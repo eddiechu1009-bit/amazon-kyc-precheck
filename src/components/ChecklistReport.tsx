@@ -1,8 +1,22 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useT } from '../i18n';
 import type { ChecklistItem, Priority, WizardAnswers } from '../data/types';
 import SourcesBlock from './SourcesBlock';
 import { buildMarkdown, downloadText, copyToClipboard } from '../lib/export';
+
+/**
+ * 勾選狀態要存下來。原本是純 useState —— 賣家一份一份備文件、整理到一半重整或關掉分頁，
+ * 勾好的全部消失；而隔壁兩支工具（準備清單、營運工具箱）都是會記住的，行為不一致。
+ */
+const CHECKED_KEY = 'pass-kyc-report-checked';
+
+function loadChecked(): Set<string> {
+  try {
+    const raw = localStorage.getItem(CHECKED_KEY);
+    if (raw) return new Set(JSON.parse(raw) as string[]);
+  } catch { /* ignore */ }
+  return new Set();
+}
 
 interface Props {
   items: ChecklistItem[];
@@ -12,8 +26,14 @@ interface Props {
 
 export default function ChecklistReport({ items, answers, onEdit }: Props) {
   const { t, lang, tx } = useT();
-  const [checked, setChecked] = useState<Set<string>>(new Set());
+  const [checked, setChecked] = useState<Set<string>>(loadChecked);
   const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(CHECKED_KEY, JSON.stringify([...checked]));
+    } catch { /* ignore */ }
+  }, [checked]);
 
   const toggle = (id: string) =>
     setChecked((prev) => {
