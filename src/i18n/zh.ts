@@ -53,12 +53,12 @@ export const zh = {
   optBo3: '3 位以上',
 
   qBankTitle: '要用哪個國家 / 地區的銀行帳戶收款？',
-  qBankHint: '台灣、香港、美國、EU 本地、第三方收款 (Payoneer/WorldFirst) 等。',
+  qBankHint: '台灣、香港、美國、EU 本地、第三方收款服務等（例如 Payoneer、WorldFirst，僅列舉供辨識）。',
   optBankTw: '台灣銀行',
   optBankHk: '香港銀行',
   optBankUs: '美國銀行',
   optBankEu: 'EU 當地銀行',
-  optBank3p: '第三方收款 (Payoneer / WorldFirst / PingPong 等)',
+  optBank3p: '第三方收款服務（例如 Payoneer、WorldFirst、PingPong）',
 
   qAddressChangedTitle: '最近 30 天內改過公司地址、Email 或電話嗎？',
   qAddressChangedHint: '資訊變更會重新觸發 KYC，這時特別容易被要求補件。',

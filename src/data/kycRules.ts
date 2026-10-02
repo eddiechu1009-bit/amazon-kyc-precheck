@@ -359,7 +359,7 @@ const BANK_STATEMENT: ChecklistItem = {
     en: 'Bank Statement / Certified Letter (within 180 days)',
   },
   why: {
-    zh: '對帳單要對上亞馬遜收款帳戶的持有人與銀行代碼。第三方收款（Payoneer 等）要另一套驗證。',
+    zh: '對帳單要對上亞馬遜收款帳戶的持有人與銀行代碼。第三方收款服務（例如 Payoneer）要另一套驗證。',
     en: 'The statement must match the disbursement account holder and bank code. Third-party accounts (Payoneer etc.) require a different verification flow.',
   },
   prepTips: [
@@ -403,8 +403,8 @@ const BANK_STATEMENT: ChecklistItem = {
 const THIRD_PARTY_BANK: ChecklistItem = {
   id: 'third_party_bank',
   title: {
-    zh: '第三方收款帳戶驗證文件（Payoneer / WF / PingPong）',
-    en: 'Third-Party Payment Account Verification (Payoneer / WorldFirst / PingPong)',
+    zh: '第三方收款帳戶驗證文件（例如 Payoneer、WorldFirst、PingPong 開的 ACL）',
+    en: 'Third-Party Payment Account Verification (e.g. ACL from Payoneer, WorldFirst, PingPong)',
   },
   why: {
     zh: '第三方收款本身另外要做 Bank Account Verification (BAV)，跟 KYC 是兩條線。',
@@ -420,7 +420,7 @@ const THIRD_PARTY_BANK: ChecklistItem = {
       en: 'Make sure the account currency matches what Amazon will disburse.',
     },
     {
-      zh: '若 BAV 被退件，第一個動作是去 Payoneer/WF 後台再重下一次 ACL，不要直接申訴。',
+      zh: '若 BAV 被退件，第一個動作是去你的收款服務後台（例如 Payoneer、WorldFirst）重新下載一次 ACL，不要直接申訴。',
       en: 'If BAV fails, first re-download a fresh ACL from your provider before appealing.',
     },
   ],

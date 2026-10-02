@@ -246,7 +246,7 @@ export const categories: CategoryDef[] = [
   {
     id: 'third_party_acl_invalid',
     title: {
-      zh: '第三方收款 (Payoneer / WF / PingPong) ACL 不符',
+      zh: '第三方收款服務的 ACL 不符（例如 Payoneer、WorldFirst、PingPong）',
       en: 'Third-party payment account (Payoneer / WF / PingPong) verification letter invalid',
     },
     summary: {
@@ -268,7 +268,7 @@ export const categories: CategoryDef[] = [
       { zh: '收款幣別不支援(例如指定 GBP 但 ACL 只支援 USD)。', en: 'Currency mismatch (e.g. required GBP but the ACL only supports USD).' },
     ],
     nextSteps: [
-      { zh: '去 Payoneer / WorldFirst / PingPong 後台下載最新版本的 ACL(不要用舊的)。', en: 'Go to your provider portal and download a FRESH ACL (do not reuse old ones).' },
+      { zh: '去你的收款服務後台（例如 Payoneer、WorldFirst、PingPong）下載最新版本的 ACL(不要用舊的)。', en: 'Go to your provider portal and download a FRESH ACL (do not reuse old ones).' },
       { zh: '檢查 ACL 上的:收款人名、幣別、帳號、銀行名稱,是否與 Seller Central 設定 100% 一致。', en: 'Verify holder name, currency, account number, bank name on the ACL match Seller Central 100%.' },
       { zh: '若資訊對不上,先在第三方後台改,再回來 Seller Central 重新填寫,最後按 Retry 上傳新 ACL。', en: 'If there is a mismatch, correct it in the provider portal first, re-enter in Seller Central, then click Retry.' },
       { zh: 'BAV 退件通常是「文件問題」不是「帳號問題」,不要急著換銀行,先確認 ACL 本身符合要求。', en: 'BAV rejections are usually document problems, not account problems — fix the ACL before switching banks.' },

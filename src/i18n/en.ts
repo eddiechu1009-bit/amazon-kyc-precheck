@@ -56,12 +56,12 @@ export const en: typeof zh = {
   optBo3: '3 or more',
 
   qBankTitle: 'Which country / region hosts the bank account you will use for disbursements?',
-  qBankHint: 'TW, HK, US, EU local, or a third-party like Payoneer / WorldFirst.',
+  qBankHint: 'TW, HK, US, EU local, or a third-party payment service (e.g. Payoneer, WorldFirst; examples only).',
   optBankTw: 'Taiwan bank',
   optBankHk: 'Hong Kong bank',
   optBankUs: 'US bank',
   optBankEu: 'EU local bank',
-  optBank3p: 'Third-party (Payoneer / WorldFirst / PingPong ...)',
+  optBank3p: 'Third-party payment service (e.g. Payoneer, WorldFirst, PingPong)',
 
   qAddressChangedTitle: 'Have you changed your company address, email, or phone in the last 30 days?',
   qAddressChangedHint: 'Any info change re-triggers KYC — a common moment to get asked for more docs.',
