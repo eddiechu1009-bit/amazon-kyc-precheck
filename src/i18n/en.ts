@@ -40,9 +40,9 @@ export const en: typeof zh = {
   qEntityTypeTitle: 'What kind of legal entity do you operate?',
   qEntityTypeHint: 'The required documents differ significantly by entity type. This is the most important question.',
   optLimited: 'Limited / Incorporated Company',
-  optLimitedHint: 'Taiwan Gongsi, HK Ltd., Mainland LLC, BV, GmbH, etc.',
+  optLimitedHint: 'Taiwan company (Co., Ltd.), HK Ltd., Mainland China LLC, BV, GmbH, etc.',
   optSoleProp: 'Sole Proprietorship / Business License',
-  optSolePropHint: 'Taiwan Hanghao, one-person studio',
+  optSolePropHint: 'Taiwan sole proprietorship or partnership (registered business firm), one-person studio',
   optIndividual: 'Individual Seller',
   optIndividualHint: 'Registered as an individual with no company record',
 
